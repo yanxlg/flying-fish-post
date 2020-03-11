@@ -1,12 +1,3 @@
-# ffpost-front-ui
+# scm-front
 
-##### Version
-- https://github.com/ant-design/ant-design/releases/tag/4.0.2
-- https://github.com/ant-design/ant-design-pro/releases/tag/4.0.0
-
-##### 参考功能
-```
-https://fpadmin-t.vova.com.hk/web/login.php
-账号：yzhang
-密码：qwer1234
-```
+供应链管理中台界面
