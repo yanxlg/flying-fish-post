@@ -1,12 +1,9 @@
 import React from 'react';
-import '../styles/index.less';
+// import '../styles/index.less';
 import '../styles/login.less';
 import { Button, Checkbox, Input } from 'antd';
 import { BindAll } from 'lodash-decorators';
-import { userLogin } from '@/services/user';
-import { getPageQuery } from '@/utils/request';
 import { history } from 'umi';
-import User from '@/storage/User';
 import { CheckboxChangeEvent } from 'antd/es/checkbox';
 
 declare interface ILoginState {
@@ -26,11 +23,11 @@ class Login extends React.PureComponent<{}, ILoginState> {
     constructor(props: {}) {
         super(props);
         this.state = {
-            userName: User.userName,
-            password: User.password,
-            remember: !!User.password,
-            userNameActive: !!User.userName,
-            passwordActive: !!User.password,
+            userName: '',
+            password: '',
+            remember: false,
+            userNameActive: false,
+            passwordActive: false,
             login: false,
         };
     }
@@ -73,7 +70,7 @@ class Login extends React.PureComponent<{}, ILoginState> {
             login: true,
         });
         const { password = '', userName = '', remember } = this.state;
-        userLogin({
+        /*userLogin({
             username: userName,
             password: password,
         })
@@ -121,7 +118,7 @@ class Login extends React.PureComponent<{}, ILoginState> {
                 this.setState({
                     login: false,
                 });
-            });
+            });*/
     }
     private onRememberChange(e: CheckboxChangeEvent) {
         this.setState({
