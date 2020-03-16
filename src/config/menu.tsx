@@ -13,7 +13,7 @@ export default [
         icon: <Icons type="scm-setting" />,
         children: [
             {
-                path: '/platform/index',
+                path: '/platform',
                 name: '接入平台',
             }
         ],

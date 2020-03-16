@@ -83,7 +83,7 @@ class BasicLayout extends React.PureComponent<BasicLayoutProps> {
                 // links={[<div key="1" className="menu-link">草稿箱（9999999）</div>]}
                 {...props}
             >
-                {children}
+                <div className="container">{children}</div>
             </ProLayout>
         );
     }

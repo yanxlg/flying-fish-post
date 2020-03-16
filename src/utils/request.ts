@@ -6,7 +6,7 @@ import { message, notification } from 'antd';
 import { extend, RequestOptionsInit, ResponseError } from 'umi-request';
 import { history } from 'umi';
 import { parse, stringify } from 'querystring';
-import User from '@/storage/User';
+// import User from '@/storage/User';
 
 let messageQueue: string[] = []; // 消息队列 避免重复msg显示
 
@@ -153,17 +153,17 @@ const requestId = function() {
 };
 
 // 登录身份设置
-request.interceptors.request.use((url: string, options: RequestOptionsInit) => {
-    if (User.token) {
-        options.headers = Object.assign({}, options.headers, {
-            'X-Token': User.token,
-            request_id: requestId(),
-        });
-    }
-    return {
-        url,
-        options,
-    };
-});
+// request.interceptors.request.use((url: string, options: RequestOptionsInit) => {
+//     if (User.token) {
+//         options.headers = Object.assign({}, options.headers, {
+//             'X-Token': User.token,
+//             request_id: requestId(),
+//         });
+//     }
+//     return {
+//         url,
+//         options,
+//     };
+// });
 
 export default request;
