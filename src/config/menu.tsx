@@ -8,83 +8,40 @@ export default [
         icon: <DashboardOutlined />,
     },
     {
-        path: '/task',
-        name: '任务中心',
-        icon: <Icons type="scm-task" />,
-        children: [
-            {
-                path: '/task/config',
-                name: '任务配置',
-            },
-            {
-                path: '/task/list',
-                name: '任务列表',
-                extract: true,
-            },
-            {
-                path: '/task/list/:id',
-                name: '任务详情',
-                hideInMenu: true,
-                extract: true,
-            },
-            {
-                path: '/task/drafts',
-                name: '草稿箱',
-                hideInMenu: true,
-            },
-        ],
-    },
-    {
-        path: '/goods',
-        name: '商品中心',
-        icon: <Icons type="scm-goods" />,
-        children: [
-            {
-                path: '/goods/local',
-                name: '本地产品库',
-            },
-            {
-                path: '/goods/local/version',
-                name: '商品版本',
-                hideInMenu: true,
-            },
-            {
-                path: '/goods/channel',
-                name: '渠道产品库',
-            },
-            {
-                path: '/goods/channel/version',
-                name: '商品版本更新',
-                hideInMenu: true,
-            },
-        ],
-    },
-    {
-        path: '/order',
-        name: '订单管理',
-        icon: <Icons type="scm-order" />,
-    },
-    {
-        path: '/stock',
-        name: '出入库管理',
-        icon: <Icons type="scm-io" />,
-    },
-    {
-        path: '/setting',
-        name: '基本设置',
+        path: '/platform',
+        name: '平台管理',
         icon: <Icons type="scm-setting" />,
         children: [
             {
-                path: '/setting/store',
-                name: '店铺关联',
+                path: '/platform/index',
+                name: '接入平台',
+            }
+        ],
+    },
+    {
+        path: '/logistics',
+        name: '物流订单管理',
+        icon: <Icons type="scm-task" />,
+        children: [
+            {
+                path: '/logistics/delivery',
+                name: '发货订单',
             },
             {
-                path: '/setting/price',
-                name: '价格上浮设置',
+                path: '/logistics/abnormal',
+                name: '异常订单'
             },
             {
-                path: '/setting/address',
-                name: '中转仓地址设置',
+                path: '/logistics/history',
+                name: '历史订单'
+            },
+            {
+                path: '/logistics/purchase',
+                name: '采购订单'
+            },
+            {
+                path: '/logistics/log',
+                name: '打单日志'
             },
         ],
     },
