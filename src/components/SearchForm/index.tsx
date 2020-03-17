@@ -1,26 +1,27 @@
-import React, { RefObject } from 'react';
-import { Checkbox, DatePicker, Form, Input, Select } from 'antd';
-import { FormProps } from 'antd/lib/form/Form';
-import { FormItemLabelProps } from 'antd/es/form/FormItemLabel';
-import { FormInstance } from 'antd/es/form';
+import React, { RefObject } from "react";
+import { Button, Checkbox, Col, DatePicker, Form, Input, Row, Select } from "antd";
+import { FormProps } from "antd/lib/form/Form";
+import { FormItemLabelProps } from "antd/es/form/FormItemLabel";
+import { FormInstance } from "antd/es/form";
 
-import NumberInput from '@/components/NumberInput';
-import IntegerInput from '@/components/IntegerInput';
-import moment, { Moment } from 'moment';
-import { transNumber, transNullValue } from '@/utils/transform';
-import { transEndDate, transStartDate } from '@/utils/date';
-import '@/styles/form.less';
-import '@/styles/index.less';
+import NumberInput from "@/components/NumberInput";
+import IntegerInput from "@/components/IntegerInput";
+import moment, { Moment } from "moment";
+import { transNumber, transNullValue } from "@/utils/transform";
+import { transEndDate, transStartDate } from "@/utils/date";
+import styles from "@/styles/_form.less";
+import "@/styles/index.less";
 
 const { Option } = Select;
 
 declare interface IOptionItem {
     name: string;
     value: string | number;
+
     [key: string]: any;
 }
 
-type formatter = 'number' | 'start_date' | 'end_date';
+type formatter = "number" | "start_date" | "end_date";
 
 type FormItemName = string;
 
@@ -35,13 +36,13 @@ type setStateFunc = <K extends keyof ISearchFormState>(
 ) => void;
 
 type SingleField = {
-    type: 'input' | 'select' | 'checkbox' | 'datePicker' | 'number' | 'integer';
+    type: "input" | "select" | "checkbox" | "datePicker" | "number" | "integer";
     name: FormItemName;
     formatter?: formatter;
 };
 
 type DoubleFields = {
-    type: 'dateRanger';
+    type: "dateRanger";
     name: [FormItemName, FormItemName];
     formatter?: [formatter, formatter];
 };
@@ -57,8 +58,8 @@ export type IFieldItem = FormItemLabelProps & {
     };
     className?: string;
     formItemClassName?: string;
-    dateBeginWith?: Array<FormItemName | 'now'>;
-    dateEndWith?: Array<FormItemName | 'now'>;
+    dateBeginWith?: Array<FormItemName | "now">;
+    dateEndWith?: Array<FormItemName | "now">;
     onChange?: (name: FormItemName, form: FormInstance, setState: setStateFunc) => void; // change监听，支持外部执行表单操作，可以实现关联筛选，重置等操作
 } & (SingleField | DoubleFields);
 
@@ -88,9 +89,9 @@ export default class SearchForm extends React.PureComponent<ISearchFormProps, IS
     private loadOptions = () => {
         const { fieldList } = this.props;
         fieldList.forEach(field => {
-            if (field.type === 'select') {
+            if (field.type === "select") {
                 const optionList = field.optionList;
-                if (typeof optionList === 'function') {
+                if (typeof optionList === "function") {
                     const name = field.name as string;
                     optionList()
                         .then(optionList => {
@@ -128,11 +129,11 @@ export default class SearchForm extends React.PureComponent<ISearchFormProps, IS
             // 取最小值=> endOf('d');
             dateBeginWith.map(dependence => {
                 const date =
-                    dependence === 'now'
+                    dependence === "now"
                         ? moment()
                         : this.formRef.current!.getFieldValue(dependence);
                 if (date) {
-                    const time = date.startOf('day').valueOf();
+                    const time = date.startOf("day").valueOf();
                     if ((timeMax && time < timeMax) || timeMax === void 0) {
                         timeMax = time;
                     }
@@ -141,7 +142,7 @@ export default class SearchForm extends React.PureComponent<ISearchFormProps, IS
             if (!startTime || timeMax === void 0) {
                 return false;
             }
-            return startTime.startOf('day').valueOf() < timeMax;
+            return startTime.startOf("day").valueOf() < timeMax;
         };
     };
     private disabledEndDate = (dateEndWith?: string[]) => {
@@ -153,11 +154,11 @@ export default class SearchForm extends React.PureComponent<ISearchFormProps, IS
             // 取最大值=> startOf('d');
             dateEndWith.map(dependence => {
                 const date =
-                    dependence === 'now'
+                    dependence === "now"
                         ? moment()
                         : this.formRef.current!.getFieldValue(dependence);
                 if (date) {
-                    const time = date.endOf('day').valueOf();
+                    const time = date.endOf("day").valueOf();
                     if ((timeMax && time < timeMax) || timeMax === void 0) {
                         timeMax = time;
                     }
@@ -166,32 +167,39 @@ export default class SearchForm extends React.PureComponent<ISearchFormProps, IS
             if (!endTime || timeMax === void 0) {
                 return false;
             }
-            return timeMax < endTime.endOf('day').valueOf();
+            return timeMax < endTime.endOf("day").valueOf();
         };
     };
 
     private addFormItem = (field: IFieldItem) => {
         switch (field.type) {
-            case 'input':
+            case "input":
                 return this.addInput(field);
-            case 'select':
+            case "select":
                 return this.addSelect(field);
-            case 'checkbox':
+            case "checkbox":
                 return this.addCheckbox(field);
-            case 'datePicker':
+            case "datePicker":
                 return this.addDatePicker(field);
-            case 'dateRanger':
+            case "dateRanger":
                 return this.addDateRanger(field);
-            case 'integer':
+            case "integer":
                 return this.addInteger(field);
-            case 'number':
+            case "number":
                 return this.addNumber(field);
             default:
                 return null;
         }
     };
     private addNumber = (field: IFieldItem) => {
-        const { name, placeholder, label, className, formItemClassName, onChange } = field;
+        const {
+            name,
+            placeholder,
+            label,
+            className = [styles.formInput, styles.formInputHandler].join(" "),
+            formItemClassName = styles.formItem,
+            onChange,
+        } = field;
         const { labelClassName } = this.props;
         const eventProps = onChange
             ? {
@@ -221,7 +229,14 @@ export default class SearchForm extends React.PureComponent<ISearchFormProps, IS
         );
     };
     private addInteger = (field: IFieldItem) => {
-        const { name, placeholder, label, className, formItemClassName, onChange } = field;
+        const {
+            name,
+            placeholder,
+            label,
+            className = styles.formInput,
+            formItemClassName = [styles.formItem, styles.formInputHandler].join(" "),
+            onChange,
+        } = field;
         const { labelClassName } = this.props;
         const eventProps = onChange
             ? {
@@ -252,12 +267,12 @@ export default class SearchForm extends React.PureComponent<ISearchFormProps, IS
     };
 
     private addDateRanger = (field: IFieldItem) => {
-        const { labelClassName = '' } = this.props;
+        const { labelClassName = "" } = this.props;
         const {
             label,
             className,
             name: [name1, name2],
-            formItemClassName,
+            formItemClassName = styles.formItem,
             onChange,
         } = field;
         const event1Props = onChange
@@ -292,7 +307,7 @@ export default class SearchForm extends React.PureComponent<ISearchFormProps, IS
                     shouldUpdate={(prevValues, currentValues) =>
                         prevValues[name2] !== currentValues[name2]
                     }
-                    className="form-item-inline inline-block margin-none vertical-middle"
+                    className={`${styles.formInline} inline-block margin-none vertical-middle`}
                 >
                     {({ getFieldValue }) => {
                         const endTime = getFieldValue(name2);
@@ -313,9 +328,9 @@ export default class SearchForm extends React.PureComponent<ISearchFormProps, IS
                         );
                     }}
                 </Form.Item>
-                <span className="config-colon vertical-middle">-</span>
+                <span className={`${styles.formColon} vertical-middle`}>-</span>
                 <Form.Item
-                    className="form-item-inline inline-block vertical-middle margin-none"
+                    className={`${styles.formInline} inline-block margin-none vertical-middle`}
                     shouldUpdate={(prevValues, currentValues) =>
                         prevValues[name1] !== currentValues[name1]
                     }
@@ -344,7 +359,14 @@ export default class SearchForm extends React.PureComponent<ISearchFormProps, IS
     };
 
     private addInput = (field: IFieldItem) => {
-        const { name, placeholder, label, className, formItemClassName, onChange } = field;
+        const {
+            name,
+            placeholder,
+            label,
+            className = styles.formInput,
+            formItemClassName = styles.formItem,
+            onChange,
+        } = field;
         const { labelClassName } = this.props;
         const eventProps = onChange
             ? {
@@ -371,7 +393,7 @@ export default class SearchForm extends React.PureComponent<ISearchFormProps, IS
 
     private getOptionList(field: IFieldItem): { loading: boolean; optionList: IOptionItem[] } {
         const { name, optionList, optionListDependence } = field;
-        const isFunction = typeof optionList === 'function';
+        const isFunction = typeof optionList === "function";
         if (isFunction) {
             const { optionMap } = this.state;
             const syncOptionList = optionMap[name as string];
@@ -417,8 +439,8 @@ export default class SearchForm extends React.PureComponent<ISearchFormProps, IS
         const {
             name,
             label,
-            className,
-            formItemClassName,
+            className = styles.formInput,
+            formItemClassName = styles.formItem,
             syncDefaultOption,
             optionListDependence,
             onChange,
@@ -502,8 +524,8 @@ export default class SearchForm extends React.PureComponent<ISearchFormProps, IS
             name,
             placeholder,
             label,
-            className,
-            formItemClassName,
+            className = styles.formInput,
+            formItemClassName = styles.formItem,
             dateBeginWith,
             dateEndWith,
             onChange,
@@ -543,7 +565,7 @@ export default class SearchForm extends React.PureComponent<ISearchFormProps, IS
     };
 
     private addCheckbox = (field: IFieldItem) => {
-        const { name, label, formItemClassName, className, onChange } = field;
+        const { name, label, formItemClassName = styles.formItem, className, onChange } = field;
         const eventProps = onChange
             ? {
                   onChange: () => {
@@ -577,11 +599,11 @@ export default class SearchForm extends React.PureComponent<ISearchFormProps, IS
 
     private getFormatCallback = (format?: formatter) => {
         return format
-            ? format === 'number'
+            ? format === "number"
                 ? transNumber
-                : format === 'start_date'
+                : format === "start_date"
                 ? transStartDate
-                : format === 'end_date'
+                : format === "end_date"
                 ? transEndDate
                 : transNullValue
             : transNullValue;
@@ -603,7 +625,7 @@ export default class SearchForm extends React.PureComponent<ISearchFormProps, IS
         this.formatterMap.clear();
         fieldList.forEach(({ name, formatter }) => {
             if (formatter) {
-                if (typeof name === 'string') {
+                if (typeof name === "string") {
                     this.formatterMap.set(name, formatter as formatter);
                 } else {
                     name.forEach((item, index) => {
@@ -613,6 +635,7 @@ export default class SearchForm extends React.PureComponent<ISearchFormProps, IS
             }
         });
     };
+
     componentDidMount(): void {
         this.resetFormatterMap();
         this.loadOptions();
