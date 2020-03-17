@@ -11,6 +11,7 @@
     "dependencies": {
         "@ant-design/pro-layout": "^5.0.5",
         "@ant-design/icons": "^4.0.2",
+        "@ant-design/pro-table": "^2.1.7",
         "antd": "^4.0.2",
         "lodash-decorators": "^6.0.1",
         "moment": "^2.24.0",
