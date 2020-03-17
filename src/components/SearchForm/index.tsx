@@ -23,7 +23,7 @@ declare interface IOptionItem {
 
 type formatter = "number" | "start_date" | "end_date";
 
-type FormItemName = string;
+type FormItemName<T = string> = T;
 
 type setStateFunc = <K extends keyof ISearchFormState>(
     state:
@@ -35,36 +35,36 @@ type setStateFunc = <K extends keyof ISearchFormState>(
     callback?: () => void,
 ) => void;
 
-type SingleField = {
+type SingleField<T = string> = {
     type: "input" | "select" | "checkbox" | "datePicker" | "number" | "integer";
-    name: FormItemName;
+    name: FormItemName<T>;
     formatter?: formatter;
 };
 
-type DoubleFields = {
+type DoubleFields<T = string> = {
     type: "dateRanger";
-    name: [FormItemName, FormItemName];
+    name: [FormItemName<T>, FormItemName<T>];
     formatter?: [formatter, formatter];
 };
 
-export type IFieldItem = FormItemLabelProps & {
+export type IFieldItem<T = string> = FormItemLabelProps & {
     placeholder?: string;
     optionList?: IOptionItem[] | (() => Promise<IOptionItem[]>); // 支持异步获取
     syncDefaultOption?: IOptionItem; // 异步获取options是默认选项，通常用于胚子'全部'
     optionListDependence?: {
-        name: FormItemName; // 异步存储在state中的数据
+        name: FormItemName<T>; // 异步存储在state中的数据
         key: string; // 关联key
         convert?: (item: any) => IOptionItem;
     };
     className?: string;
     formItemClassName?: string;
-    dateBeginWith?: Array<FormItemName | "now">;
-    dateEndWith?: Array<FormItemName | "now">;
+    dateBeginWith?: Array<FormItemName<T> | "now">;
+    dateEndWith?: Array<FormItemName<T> | "now">;
     onChange?: (name: FormItemName, form: FormInstance, setState: setStateFunc) => void; // change监听，支持外部执行表单操作，可以实现关联筛选，重置等操作
-} & (SingleField | DoubleFields);
+} & (SingleField<T> | DoubleFields<T>);
 
-declare interface ISearchFormProps extends FormProps {
-    fieldList: IFieldItem[];
+declare interface ISearchFormProps<T = string> extends FormProps {
+    fieldList: IFieldItem<T>[];
     labelClassName?: string;
     formRef?: RefObject<FormInstance>;
 }
