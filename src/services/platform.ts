@@ -1,12 +1,17 @@
-import request, { errorHandlerFactory } from '@/utils/request';
-import { IResponse } from '@/interface/IGlobal';
-import { PlatformApiPath } from '@/config/api/PlatformApiPath';
-import { IPlatformListQuery } from '@/interface/IPlatform';
+import request from "@/utils/request";
+import { IPaginationResponse, IRequestPagination, IResponse } from "@/interface/IGlobal";
+import { PlatformApiPath } from "@/config/api/PlatformApiPath";
+import { IFormItems, ITableListItem, IOptionListResponse } from "@/interface/IPlatform";
 
-export async function getPlatformList(params: IPlatformListQuery) {
-    return request.get<IResponse<any>>(PlatformApiPath.getProductList, {
-        params
-    });
+export async function getPlatformList(params: IFormItems & IRequestPagination) {
+    return request.get<IResponse<IPaginationResponse<ITableListItem>>>(
+        PlatformApiPath.getProductList,
+        {
+            params,
+        },
+    );
 }
 
-
+export async function queryOptionList() {
+    return request.get<IResponse<IOptionListResponse>>(PlatformApiPath.queryOptionList);
+}
