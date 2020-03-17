@@ -1,89 +1,196 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { PageHeaderWrapper } from "@ant-design/pro-layout";
-import ProTable, { ProColumns, ActionType } from "@ant-design/pro-table";
-import { Divider, Button, Dropdown, Menu, Card } from "antd";
-import { SorterResult } from "antd/lib/table/interface";
-import { PlusOutlined, DownOutlined } from "@ant-design/icons";
+import ProTable, { ProColumns } from "@ant-design/pro-table";
+import { Card } from "antd";
 import SearchForm, { IFieldItem } from "@/components/SearchForm";
 import formStyles from "@/styles/_form.less";
 import btnStyles from "@/styles/_btn.less";
 import LoadingButton from "@/components/LoadingButton";
+import { IFormItems, TableListItem } from "@/interface/IReturn";
+import { queryReturnList, exportReturnList, queryOptionList } from "@/services/afterSale";
+import { PaginationConfig } from "antd/es/pagination";
 
-const formConfig: IFieldItem[] = [
+const queryOptions = queryOptionList();
+
+const formConfig: IFieldItem<keyof IFormItems>[] = [
     {
-        label: "任务ID",
+        label: "单号",
         type: "input",
-        name: "task_id",
+        name: "number",
     },
     {
-        label: "任务SN",
-        type: "number",
-        name: "task_sn",
+        label: "物流方式",
+        type: "select",
+        name: "logistics_mode",
         formatter: "number",
+        syncDefaultOption: {
+            name: "全部",
+            value: "",
+        },
+        optionList: () => {
+            return queryOptions.then(({ data: { logistics_mode_list = [] } }) => {
+                return logistics_mode_list;
+            });
+        },
+    },
+    {
+        label: "退货类型",
+        type: "select",
+        name: "return_type",
+        formatter: "number",
+        syncDefaultOption: {
+            name: "全部",
+            value: "",
+        },
+        optionList: () => {
+            return queryOptions.then(({ data: { return_type_list = [] } }) => {
+                return return_type_list;
+            });
+        },
+    },
+    {
+        label: "退货平台",
+        type: "select",
+        name: "return_platform",
+        formatter: "number",
+        syncDefaultOption: {
+            name: "全部",
+            value: "",
+        },
+        optionList: () => {
+            return queryOptions.then(({ data: { return_type_list = [] } }) => {
+                return return_type_list;
+            });
+        },
+    },
+    {
+        label: "创建时间",
+        type: "dateRanger",
+        name: ["create_time_start", "create_time_end"],
+        formatter: ["start_date", "end_date"],
     },
 ];
 
-const ReturnPage: React.FC = () => {
-    const [sorter, setSorter] = useState<string>("");
-    const [createModalVisible, handleModalVisible] = useState<boolean>(false);
-    const [updateModalVisible, handleUpdateModalVisible] = useState<boolean>(false);
-    const [stepFormValues, setStepFormValues] = useState({});
-    const actionRef = useRef<ActionType>();
-    const columns: ProColumns<TableListItem>[] = [
-        {
-            title: "规则名称",
-            dataIndex: "name",
-            rules: [
-                {
-                    required: true,
-                    message: "规则名称为必填项",
-                },
-            ],
-        },
-        {
-            title: "描述",
-            dataIndex: "desc",
-        },
-        {
-            title: "服务调用次数",
-            dataIndex: "callNo",
-            sorter: true,
-            renderText: (val: string) => `${val} 万`,
-        },
-        {
-            title: "状态",
-            dataIndex: "status",
-            valueEnum: {
-                0: { text: "关闭", status: "Default" },
-                1: { text: "运行中", status: "Processing" },
-                2: { text: "已上线", status: "Success" },
-                3: { text: "异常", status: "Error" },
-            },
-        },
-        {
-            title: "上次调度时间",
-            dataIndex: "updatedAt",
-            sorter: true,
-        },
-        {
-            title: "操作",
-            dataIndex: "option",
-            render: (_, record) => (
-                <>
-                    <a
-                        onClick={() => {
-                            handleUpdateModalVisible(true);
-                            setStepFormValues(record);
-                        }}
-                    >
-                        配置
-                    </a>
-                    <Divider type="vertical" />
-                    <a href="">订阅警报</a>
-                </>
-            ),
-        },
-    ];
+const columns: ProColumns<TableListItem>[] = [
+    {
+        title: "单号",
+        dataIndex: "number",
+        align: "center",
+    },
+    {
+        title: "类型",
+        dataIndex: "logistics_mode",
+        align: "center",
+    },
+    {
+        title: "平台类型",
+        dataIndex: "return_platform",
+        align: "center",
+    },
+    {
+        title: "状态",
+        dataIndex: "status",
+        align: "center",
+    },
+    {
+        title: "运单号",
+        dataIndex: "track_number",
+        align: "center",
+    },
+    {
+        title: "物流渠道",
+        dataIndex: "physical_channel",
+        align: "center",
+    },
+    {
+        title: "当前节点",
+        dataIndex: "current_node",
+        align: "center",
+    },
+    {
+        title: "费用",
+        dataIndex: "cost",
+        align: "center",
+    },
+    {
+        title: "退入仓库",
+        dataIndex: "return_warehouse",
+        align: "center",
+    },
+    {
+        title: "入库单号",
+        dataIndex: "warehouse_receipt",
+        align: "center",
+    },
+    {
+        title: "创建时间",
+        dataIndex: "create_time",
+        align: "center",
+    },
+    {
+        title: "操作",
+        dataIndex: "option",
+        align: "center",
+        render: (_, record) => <></>,
+    },
+];
+
+const ReturnPage: React.FC = props => {
+    const [loading, setLoading] = useState(true);
+    const [pageNumber, setPageNumber] = useState(1);
+    const [pageSize, setPageSize] = useState(50);
+    const [dataSource, setDataSource] = useState<TableListItem[]>([]);
+    const [total, setTotal] = useState(0);
+    const searchRef = useRef<SearchForm>(null);
+
+    const getListData = ({
+        page = pageNumber,
+        page_count = pageSize,
+    }: { page?: number; page_count?: number } = {}) => {
+        const formValues = searchRef.current!.getFieldsValue();
+        const query = {
+            ...formValues,
+            page: page,
+            page_count: page_count,
+        };
+        return queryReturnList(query)
+            .then(({ data: { list = [], total = 0 } }) => {
+                setDataSource(list);
+                setTotal(total);
+                setPageNumber(page);
+                setPageSize(page_count);
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+    };
+
+    const exportTable = () => {
+        const query = searchRef.current!.getFieldsValue();
+        return exportReturnList(query);
+    };
+
+    const onSearch = useCallback(() => {
+        return getListData({
+            page: 1,
+        });
+    }, []);
+
+    const onChange = useCallback(({ current, pageSize }: PaginationConfig) => {
+        getListData({
+            page: current,
+            page_count: pageSize,
+        });
+    }, []);
+
+    const reload = useCallback(() => {
+        getListData();
+    }, []);
+
+    useEffect(() => {
+        onSearch();
+    }, []);
+
     return useMemo(() => {
         return (
             <PageHeaderWrapper>
@@ -91,11 +198,19 @@ const ReturnPage: React.FC = () => {
                     bordered={false}
                     className={[formStyles.formItem, formStyles.formCard].join(" ")}
                 >
-                    <SearchForm fieldList={formConfig}>
+                    <SearchForm
+                        fieldList={formConfig}
+                        ref={searchRef}
+                        initialValues={{
+                            logistics_mode: "",
+                            return_type: "",
+                            return_platform: "",
+                        }}
+                    >
                         <LoadingButton
                             className={btnStyles.btnGroup}
                             type="primary"
-                            onClick={() => {}}
+                            onClick={onSearch}
                         >
                             搜索
                         </LoadingButton>
@@ -104,55 +219,38 @@ const ReturnPage: React.FC = () => {
                 <ProTable<TableListItem>
                     search={false}
                     headerTitle="查询表格"
-                    actionRef={actionRef}
-                    rowKey="key"
-                    onChange={(_, _filter, _sorter) => {
-                        const sorterResult = _sorter as SorterResult<TableListItem>;
-                        if (sorterResult.field) {
-                            setSorter(`${sorterResult.field}_${sorterResult.order}`);
-                        }
-                    }}
-                    params={{
-                        sorter,
+                    rowKey="number"
+                    pagination={{
+                        total: total,
+                        current: pageNumber,
+                        pageSize: pageSize,
+                        showSizeChanger: true,
+                        pageSizeOptions: ["50", "100", "200"],
                     }}
                     toolBarRender={(action, { selectedRows }) => [
-                        <Button type="primary" onClick={() => handleModalVisible(true)}>
-                            <PlusOutlined /> 新建
-                        </Button>,
-                        selectedRows && selectedRows.length > 0 && (
-                            <Dropdown
-                                overlay={
-                                    <Menu
-                                        onClick={async e => {
-                                            if (e.key === "remove") {
-                                                action.reload();
-                                            }
-                                        }}
-                                        selectedKeys={[]}
-                                    >
-                                        <Menu.Item key="remove">批量删除</Menu.Item>
-                                        <Menu.Item key="approval">批量审批</Menu.Item>
-                                    </Menu>
-                                }
-                            >
-                                <Button>
-                                    批量操作 <DownOutlined />
-                                </Button>
-                            </Dropdown>
-                        ),
+                        <LoadingButton type="primary" onClick={exportTable}>
+                            批量导出
+                        </LoadingButton>,
                     ]}
                     tableAlertRender={(selectedRowKeys, selectedRows) => (
                         <div>
                             已选择 <a style={{ fontWeight: 600 }}>{selectedRowKeys.length}</a> 项
                         </div>
                     )}
-                    // request={params => {}}
                     columns={columns}
-                    rowSelection={{}}
+                    dataSource={dataSource}
+                    loading={loading}
+                    onChange={onChange}
+                    options={{
+                        density: true,
+                        fullScreen: true,
+                        reload: reload,
+                        setting: true,
+                    }}
                 />
             </PageHeaderWrapper>
         );
-    }, []);
+    }, [dataSource, loading, pageNumber, pageSize, total]);
 };
 
 export default ReturnPage;

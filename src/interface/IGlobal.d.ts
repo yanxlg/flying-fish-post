@@ -1,13 +1,7 @@
-export interface IRequestPagination1 {
+export interface IRequestPagination {
     page: number;
     page_count: number;
 }
-
-export interface IRequestPagination2 {
-    page: number;
-    page_number: number;
-}
-export type IRequestPagination = IRequestPagination1 | IRequestPagination2;
 
 export interface IResponse<T> {
     code: number;
@@ -15,4 +9,14 @@ export interface IResponse<T> {
     data: T;
 }
 
+export interface IPaginationResponse<T> {
+    total: number;
+    list: T[];
+}
+
 export type IBoolean = 0 | 1;
+
+export declare interface IOptionItem {
+    name: string;
+    value: number;
+}
