@@ -3,6 +3,7 @@ import { Button } from 'antd';
 import { ColumnProps } from 'antd/es/table';
 import SearchForm, { IFieldItem } from '@/components/SearchForm';
 import { FitTable } from '@/components/FitTable';
+import EditModal from './components/EditModal';
 
 import { platformList, platformStatusList } from '@/enums/StatusEnum';
 import { getPlatformList } from '@/services/platform';
@@ -19,6 +20,8 @@ declare interface IPlatformItem {
 
 interface IState {
     loading: boolean;
+    editModalStatus: boolean;
+    type: 'add' | 'edit';
     platformList: IPlatformItem[];
 }
 
@@ -26,7 +29,7 @@ class Index extends React.PureComponent<{}, IState> {
     private formRef: RefObject<SearchForm> = React.createRef();
     private fieldsList: IFieldItem[] = [
         {
-            label: '任务状态',
+            label: '上级平台',
             type: 'select',
             name: 'pid',
             className: 'select-default',
@@ -52,7 +55,7 @@ class Index extends React.PureComponent<{}, IState> {
             name: 'platform_id',
             className: 'input-default',
             formItemClassName: 'form-item',
-            placeholder: '请输入平台id'
+            placeholder: '请输入平台id',
         },
         {
             label: '平台名称',
@@ -60,7 +63,7 @@ class Index extends React.PureComponent<{}, IState> {
             name: 'platform_name',
             className: 'input-default',
             formItemClassName: 'form-item',
-            placeholder: '请输入平台名称'
+            placeholder: '请输入平台名称',
         },
         {
             label: '平台状态',
@@ -83,11 +86,11 @@ class Index extends React.PureComponent<{}, IState> {
                 }),
             ),
         },
-    ]
+    ];
     private initialValues = {
         pid: '',
-        status: ''
-    }
+        status: '',
+    };
     private columns: ColumnProps<IPlatformItem>[] = [
         {
             title: '上级平台',
@@ -138,41 +141,61 @@ class Index extends React.PureComponent<{}, IState> {
             align: 'center',
             width: 120,
             render: (val: undefined, row: IPlatformItem) => {
-                return <Button type="link">编辑</Button>
-            }
+                return <Button type="link">编辑</Button>;
+            },
         },
-    ]
+    ];
     constructor(props: {}) {
         super(props);
         this.state = {
             loading: false,
-            platformList: []
-        }
+            editModalStatus: false,
+            type: 'add',
+            platformList: [],
+        };
     }
+
     componentDidMount() {
         this.getPlatformList();
     }
+
     private getPlatformList() {
         this.setState({
-            loading: true
-        })
+            loading: true,
+        });
         getPlatformList({
             page: 1,
-            page_count: 50
-        }).then(res => {
-            console.log('getPlatformList', res);
-            const { list } = res.data;
-            this.setState({
-                platformList: list
-            })
-        }).finally(() => {
-            this.setState({
-                loading: false
-            })
+            page_count: 50,
         })
+            .then(res => {
+                console.log('getPlatformList', res);
+                const { list } = res.data;
+                this.setState({
+                    platformList: list,
+                });
+            })
+            .finally(() => {
+                this.setState({
+                    loading: false,
+                });
+            });
     }
+
+    private addPlatform = () => {
+        this.setState({
+            editModalStatus: true,
+            type: 'add',
+        });
+    };
+
+    private hideModal = () => {
+        this.setState({
+            editModalStatus: false,
+        });
+    };
+
     render() {
-        const { loading, platformList } = this.state;
+        const { loading, editModalStatus, type, platformList } = this.state;
         return (
             <>
                 <SearchForm
@@ -180,22 +203,10 @@ class Index extends React.PureComponent<{}, IState> {
                     fieldList={this.fieldsList}
                     initialValues={this.initialValues}
                 >
-                    <Button
-                        className="btn-group"
-                        loading={loading}
-                        // onClick={this.onSearch}
-                        type="primary"
-                        // icon={<SearchOutlined />}
-                    >
+                    <Button className="btn-group" type="primary" loading={loading}>
                         搜索
                     </Button>
-                    <Button
-                        className="btn-group"
-                        // loading={searchLoading}
-                        // onClick={this.onSearch}
-                        type="primary"
-                        // icon={<SearchOutlined />}
-                    >
+                    <Button className="btn-group" type="primary" onClick={this.addPlatform}>
                         新增
                     </Button>
                 </SearchForm>
@@ -206,8 +217,9 @@ class Index extends React.PureComponent<{}, IState> {
                     columns={this.columns}
                     dataSource={platformList}
                 />
+                <EditModal type={type} visible={editModalStatus} hideModal={this.hideModal} />
             </>
-        )
+        );
     }
 }
 
