@@ -9,8 +9,54 @@ import LoadingButton from "@/components/LoadingButton";
 import { IFormItems, TableListItem } from "@/interface/IReturn";
 import { queryReturnList, exportReturnList, queryOptionList } from "@/services/afterSale";
 import { PaginationConfig } from "antd/es/pagination";
+import { optionListToMap } from "@/utils/utils";
+
+declare interface IOptionItemProps {
+    type: "logistics_mode" | "return_type" | "return_platform" | "status";
+    value: number;
+}
 
 const queryOptions = queryOptionList();
+
+const queryOptionMap = queryOptions.then(
+    ({
+        data: {
+            logistics_mode_list = [],
+            return_type_list = [],
+            return_platform_list = [],
+            status_list = [],
+        },
+    }) => {
+        return {
+            logisticsModeMap: optionListToMap(logistics_mode_list),
+            returnTypeMap: optionListToMap(return_type_list),
+            returnPlatformMap: optionListToMap(return_platform_list),
+            statusMap: optionListToMap(status_list),
+        };
+    },
+);
+
+const OptionItem: React.FC<IOptionItemProps> = ({ type, value }) => {
+    const [label, setLabel] = useState("");
+    useMemo(() => {
+        queryOptionMap.then(({ logisticsModeMap, returnTypeMap, returnPlatformMap, statusMap }) => {
+            setLabel(
+                type == "logistics_mode"
+                    ? logisticsModeMap[value]
+                    : type === "return_type"
+                    ? returnTypeMap[value]
+                    : type === "return_platform"
+                    ? returnPlatformMap[value]
+                    : type === "status"
+                    ? statusMap[value]
+                    : "",
+            );
+        });
+    }, []);
+    return useMemo(() => {
+        return <span>{label}</span>;
+    }, [label]);
+};
 
 const formConfig: IFieldItem<keyof IFormItems>[] = [
     {
@@ -81,16 +127,25 @@ const columns: ProColumns<TableListItem>[] = [
         title: "类型",
         dataIndex: "logistics_mode",
         align: "center",
+        render: (value: any) => {
+            return <OptionItem type="logistics_mode" value={value} />;
+        },
     },
     {
         title: "平台类型",
         dataIndex: "return_platform",
         align: "center",
+        render: (value: any) => {
+            return <OptionItem type="return_platform" value={value} />;
+        },
     },
     {
         title: "状态",
         dataIndex: "status",
         align: "center",
+        render: (value: any) => {
+            return <OptionItem type="status" value={value} />;
+        },
     },
     {
         title: "运单号",
