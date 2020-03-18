@@ -60,7 +60,6 @@ const initialValues = {
     pid: "",
     status: "",
 };
-
 declare interface IProps {
     visible: boolean;
     type: "add" | "edit";

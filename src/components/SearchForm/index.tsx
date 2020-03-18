@@ -1,5 +1,5 @@
 import React, { RefObject } from "react";
-import { Button, Checkbox, Col, DatePicker, Form, Input, Row, Select } from "antd";
+import { Button, Checkbox, Col, DatePicker, Form, Input, Row, Select, Radio, Divider } from "antd";
 import { FormProps } from "antd/lib/form/Form";
 import { FormItemLabelProps } from "antd/es/form/FormItemLabel";
 import { FormInstance } from "antd/es/form";
@@ -37,7 +37,15 @@ type setStateFunc = <K extends keyof ISearchFormState>(
 ) => void;
 
 type SingleField<T = string> = {
-    type: "input" | "select" | "checkbox" | "datePicker" | "number" | "integer" | "textarea";
+    type:
+        | "input"
+        | "select"
+        | "checkbox"
+        | "datePicker"
+        | "number"
+        | "integer"
+        | "textarea"
+        | "shortcutSelect";
     name: FormItemName<T>;
     formatter?: formatter;
 };
@@ -190,6 +198,8 @@ export default class SearchForm extends React.PureComponent<ISearchFormProps, IS
                 return this.addNumber(field);
             case "textarea":
                 return this.addTextArea(field);
+            case "shortcutSelect":
+                return this.addShortcutSelect(field);
             default:
                 return null;
         }
@@ -231,6 +241,7 @@ export default class SearchForm extends React.PureComponent<ISearchFormProps, IS
             </Form.Item>
         );
     };
+
     private addInteger = (field: IFieldItem) => {
         const {
             name,
@@ -553,6 +564,74 @@ export default class SearchForm extends React.PureComponent<ISearchFormProps, IS
                 </Form.Item>
             );
         }
+    };
+
+    private addShortcutSelect = (field: IFieldItem) => {
+        const {
+            name,
+            label,
+            className = styles.formInput,
+            formItemClassName = styles.formItem,
+            // syncDefaultOption,
+            // optionListDependence,
+            onChange,
+        } = field;
+        const { labelClassName } = this.props;
+        const eventProps = onChange
+            ? {
+                  onChange: () => {
+                      onChange(
+                          name as FormItemName,
+                          this.formRef.current!,
+                          this.setState as setStateFunc,
+                      );
+                  },
+              }
+            : {};
+
+        const { loading, optionList } = this.getOptionList(field);
+
+        return (
+            <Form.Item
+                key={String(name)}
+                name={name}
+                className={formItemClassName}
+                label={<span className={labelClassName}>{label}</span>}
+            >
+                <Select
+                    mode="multiple"
+                    className={className}
+                    loading={loading}
+                    {...eventProps}
+                    dropdownRender={menu => (
+                        <div>
+                            {/* value={size} onChange={this.handleSizeChange} */}
+                            <Radio.Group className={styles.formBtnGroup} value="">
+                                <Radio.Button value="1" className={styles.formBtnItem}>
+                                    全选
+                                </Radio.Button>
+                                <Radio.Button value="0" className={styles.formBtnItem}>
+                                    取消全选
+                                </Radio.Button>
+                            </Radio.Group>
+                            <Divider className={styles.formDivider} />
+                            {menu}
+                        </div>
+                    )}
+                >
+                    {/* {syncDefaultOption ? (
+                            <Option value={syncDefaultOption.value}>
+                                {syncDefaultOption.name}
+                            </Option>
+                        ) : null} */}
+                    {optionList!.map(item => (
+                        <Option key={item.value} value={item.value}>
+                            {item.name}
+                        </Option>
+                    ))}
+                </Select>
+            </Form.Item>
+        );
     };
 
     private addDatePicker = (field: IFieldItem) => {

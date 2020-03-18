@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { Divider, Button, Card } from "antd";
 import { PageHeaderWrapper } from "@ant-design/pro-layout";
-import ProTable, { ProColumns, ActionType } from "@ant-design/pro-table";
 import { PlusOutlined, DownOutlined } from "@ant-design/icons";
 import SearchForm, { IFieldItem } from "@/components/SearchForm";
 import LoadingButton from "@/components/LoadingButton";
 import { PaginationConfig } from "antd/es/pagination";
 import EditModal from "./components/EditModal/index";
+// ProTable,
+import ProTable from "@/components/ProTable";
+import { ProColumns } from "@ant-design/pro-table";
 
 import { platformList, platformStatusList } from "@/enums/StatusEnum";
 import { getPlatformList, queryOptionList } from "@/services/platform";
@@ -249,7 +251,7 @@ const IndexPage: React.FC = props => {
                         reload: reload,
                         setting: true,
                     }}
-                    scroll={{ y: 600 }}
+                    // scroll={{ y: 600 }}
                 />
                 <EditModal visible={editModalVisible} type={editType} hideModal={hideModal} />
             </PageHeaderWrapper>
