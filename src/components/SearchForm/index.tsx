@@ -13,6 +13,7 @@ import styles from "@/styles/_form.less";
 import "@/styles/index.less";
 
 const { Option } = Select;
+const { TextArea } = Input;
 
 declare interface IOptionItem {
     name: string;
@@ -36,7 +37,7 @@ type setStateFunc = <K extends keyof ISearchFormState>(
 ) => void;
 
 type SingleField<T = string> = {
-    type: "input" | "select" | "checkbox" | "datePicker" | "number" | "integer";
+    type: "input" | "select" | "checkbox" | "datePicker" | "number" | "integer" | "textarea";
     name: FormItemName<T>;
     formatter?: formatter;
 };
@@ -187,6 +188,8 @@ export default class SearchForm extends React.PureComponent<ISearchFormProps, IS
                 return this.addInteger(field);
             case "number":
                 return this.addNumber(field);
+            case "textarea":
+                return this.addTextArea(field);
             default:
                 return null;
         }
@@ -387,6 +390,39 @@ export default class SearchForm extends React.PureComponent<ISearchFormProps, IS
                 label={<span className={labelClassName}>{label}</span>}
             >
                 <Input placeholder={placeholder} className={className} {...eventProps} />
+            </Form.Item>
+        );
+    };
+
+    private addTextArea = (field: IFieldItem) => {
+        const {
+            name,
+            placeholder,
+            label,
+            className = styles.formInput,
+            formItemClassName = styles.formItem,
+            onChange,
+        } = field;
+        const { labelClassName } = this.props;
+        const eventProps = onChange
+            ? {
+                  onChange: () => {
+                      onChange(
+                          name as FormItemName,
+                          this.formRef.current!,
+                          this.setState as setStateFunc,
+                      );
+                  },
+              }
+            : {};
+        return (
+            <Form.Item
+                key={String(name)}
+                className={formItemClassName}
+                name={name}
+                label={<span className={labelClassName}>{label}</span>}
+            >
+                <TextArea placeholder={placeholder} className={className} {...eventProps} />
             </Form.Item>
         );
     };

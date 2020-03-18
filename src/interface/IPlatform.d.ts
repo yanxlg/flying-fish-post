@@ -10,6 +10,10 @@ export declare interface IFormItems {
     status?: number;
 }
 
+export declare interface IEditFormItems extends IFormItems {
+    description?: string;
+}
+
 export declare interface ITableListItem {
     pid: number;
     platform_id: string;
@@ -22,4 +26,12 @@ export declare interface ITableListItem {
 
 export interface IOptionListResponse {
     platform_list: IOptionItem[];
+}
+
+export declare interface IRequestEdit {
+    pid?: number;
+    platform_id?: string;
+    platform_name?: string;
+    status?: number;
+    description?: string;
 }

@@ -56,5 +56,12 @@ export default {
             message: "By mock.js",
             data: optionList
         });
+    },
+    "post /*/platform/edit": async (req: Request, res: Response) => {
+        await sleep(2);
+        res.status(200).send({
+            code: 200,
+            message: "By mock.js"
+        });
     }
 };

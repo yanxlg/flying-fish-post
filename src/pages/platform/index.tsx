@@ -6,6 +6,7 @@ import { PlusOutlined, DownOutlined } from "@ant-design/icons";
 import SearchForm, { IFieldItem } from "@/components/SearchForm";
 import LoadingButton from "@/components/LoadingButton";
 import { PaginationConfig } from "antd/es/pagination";
+import EditModal from "./components/EditModal/index";
 
 import { platformList, platformStatusList } from "@/enums/StatusEnum";
 import { getPlatformList, queryOptionList } from "@/services/platform";
@@ -82,11 +83,9 @@ const IndexPage: React.FC = props => {
         pageSize: 50,
         total: 0,
     });
-    // const [pageNumber, setPageNumber] = useState(1);
-    // const [pageSize, setPageSize] = useState(50);
-    // const [total, setTotal] = useState(0);
-    const [createModalVisible, handleModalVisible] = useState<boolean>(false);
     const searchRef = useRef<SearchForm>(null);
+    const [editModalVisible, setModalVisible] = useState<boolean>(false);
+    const [editType, setEditType] = useState<"add" | "edit">("add");
 
     const columns: ProColumns<ITableListItem>[] = useMemo(() => {
         return [
@@ -144,7 +143,6 @@ const IndexPage: React.FC = props => {
             },
         ];
     }, []);
-
     const getPageList = ({
         page = pageConfig.pageNumber,
         page_count = pageConfig.pageSize,
@@ -155,13 +153,9 @@ const IndexPage: React.FC = props => {
             page: page,
             page_count: page_count,
         };
+        setLoading(true);
         return getPlatformList(params)
             .then(({ data: { list = [], total = 0 } }) => {
-                // console.log('getPlatformList', list);
-                // console.log(222, page, page_count);
-                // setPageNumber(page);
-                // setPageSize(page_count);
-                // setTotal(total);
                 setPageConfig({
                     pageNumber: page,
                     pageSize: page_count,
@@ -170,23 +164,32 @@ const IndexPage: React.FC = props => {
                 setDataSource(list);
             })
             .finally(() => {
-                // console.log(1111);
                 setLoading(false);
             });
     };
 
     const handleSearch = useCallback(() => {
+        // console.log(111111, _pageConfig);
         return getPageList({
             page: 1,
+            // page_count: pageConfig.pageSize
         });
-    }, []);
+    }, [pageConfig]);
 
     const onChange = useCallback(({ current, pageSize }: PaginationConfig) => {
-        // console.log(111,current, pageSize)
         getPageList({
             page: current,
             page_count: pageSize,
         });
+    }, []);
+
+    const addPlatform = useCallback(() => {
+        setModalVisible(true);
+        setEditType("add");
+    }, []);
+
+    const hideModal = useCallback(() => {
+        setModalVisible(false);
     }, []);
 
     const reload = useCallback(() => {
@@ -198,7 +201,7 @@ const IndexPage: React.FC = props => {
     }, []);
 
     return useMemo(() => {
-        // console.log(333,pageNumber, pageSize, total, dataSource)
+        const { total, pageNumber, pageSize } = pageConfig;
         return (
             <PageHeaderWrapper>
                 <Card
@@ -225,8 +228,8 @@ const IndexPage: React.FC = props => {
                     // actionRef={actionRef}
                     search={false}
                     loading={loading}
-                    toolBarRender={(action, { selectedRows }) => [
-                        <Button type="primary" onClick={() => handleModalVisible(true)}>
+                    toolBarRender={() => [
+                        <Button type="primary" onClick={addPlatform}>
                             <PlusOutlined /> 新建
                         </Button>,
                     ]}
@@ -234,9 +237,9 @@ const IndexPage: React.FC = props => {
                     dataSource={dataSource}
                     onChange={onChange}
                     pagination={{
-                        total: pageConfig.total,
-                        current: pageConfig.pageNumber,
-                        pageSize: pageConfig.pageSize,
+                        total: total,
+                        current: pageNumber,
+                        pageSize: pageSize,
                         showSizeChanger: true,
                         pageSizeOptions: ["50", "100", "200"],
                     }}
@@ -248,9 +251,10 @@ const IndexPage: React.FC = props => {
                     }}
                     scroll={{ y: 600 }}
                 />
+                <EditModal visible={editModalVisible} type={editType} hideModal={hideModal} />
             </PageHeaderWrapper>
         );
-    }, [loading, dataSource, pageConfig]);
+    }, [loading, dataSource, pageConfig, editModalVisible, editType]);
 };
 
 export default IndexPage;
