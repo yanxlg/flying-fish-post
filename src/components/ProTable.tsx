@@ -1,10 +1,12 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ProTableProps } from "@ant-design/pro-table/lib/Table";
 import { default as DefaultProTable, ProColumns } from "@ant-design/pro-table";
 import { Card, Pagination } from "antd";
 import { Key, SorterResult, TableCurrentDataSource } from "antd/es/table/interface";
 import { PaginationConfig } from "antd/es/pagination";
 import cardStyle from "@/styles/card.less";
+import ReactDOM from "react-dom";
+import { debounce } from "lodash";
 
 const ProTable = <
     T,
@@ -12,11 +14,39 @@ const ProTable = <
         [key: string]: any;
     } = {}
 >(
-    props: ProTableProps<T, U>,
+    props: ProTableProps<T, U> & {
+        bottom?: number;
+        minHeight?: number;
+    },
 ) => {
     const [filters, setFilters] = useState<Record<string, Key[] | null>>({});
     const [sorters, setSorters] = useState<SorterResult<T> | SorterResult<T>[]>({});
     const [extra, setExtra] = useState<TableCurrentDataSource<T>>({ currentDataSource: [] });
+    const [y, setY] = useState<number | undefined>(undefined);
+    const cardRef = useRef<Card>(null);
+
+    useEffect(() => {
+        const element = ReactDOM.findDOMNode(cardRef.current) as HTMLDivElement;
+        const resizeHeight = debounce(
+            () => {
+                const { bottom = 100, minHeight = 500 } = props;
+                const height =
+                    document.body.offsetHeight - element.getBoundingClientRect().top - bottom;
+                if ((!minHeight || height >= minHeight) && height > 0) {
+                    setY(height);
+                } else if (minHeight) {
+                    setY(minHeight);
+                }
+            },
+            300,
+            {},
+        );
+        resizeHeight();
+        window.addEventListener("resize", resizeHeight);
+        return () => {
+            window.removeEventListener("resize", resizeHeight);
+        };
+    }, []);
 
     const onDefaultChange = useCallback(
         (
@@ -48,10 +78,15 @@ const ProTable = <
     );
 
     return useMemo(() => {
-        const { pagination } = props;
+        const { pagination, scroll, ..._props } = props;
         return (
-            <Card className={cardStyle.cardPlain}>
-                <DefaultProTable<T, U> {...props} pagination={false} onChange={onDefaultChange} />
+            <Card className={cardStyle.cardPlain} ref={cardRef}>
+                <DefaultProTable<T, U>
+                    {..._props}
+                    pagination={false}
+                    onChange={onDefaultChange}
+                    scroll={{ ...scroll, y: y }}
+                />
                 {pagination ? (
                     <Pagination
                         className="ant-table-pagination"
@@ -62,7 +97,7 @@ const ProTable = <
                 ) : null}
             </Card>
         );
-    }, [props]);
+    }, [props, y]);
 };
 
 export default ProTable;
