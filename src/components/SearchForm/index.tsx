@@ -602,15 +602,24 @@ export default class SearchForm extends React.PureComponent<ISearchFormProps, IS
                     mode="multiple"
                     className={className}
                     loading={loading}
+                    optionFilterProp="children"
                     {...eventProps}
                     dropdownRender={menu => (
                         <div>
                             {/* value={size} onChange={this.handleSizeChange} */}
                             <Radio.Group className={styles.formBtnGroup} value="">
-                                <Radio.Button value="1" className={styles.formBtnItem}>
+                                <Radio.Button 
+                                    value="1" 
+                                    className={styles.formBtnItem}
+                                    onClick={() => this.selectOrCancelAll(name as string, optionList, true)}
+                                >
                                     全选
                                 </Radio.Button>
-                                <Radio.Button value="0" className={styles.formBtnItem}>
+                                <Radio.Button  
+                                    value="0" 
+                                    className={styles.formBtnItem}
+                                    onClick={() => this.selectOrCancelAll(name as string, optionList)}
+                                >
                                     取消全选
                                 </Radio.Button>
                             </Radio.Group>
@@ -750,6 +759,19 @@ export default class SearchForm extends React.PureComponent<ISearchFormProps, IS
             }
         });
     };
+
+    private selectOrCancelAll = (name: string, optionList: IOptionItem[], isSelect: boolean = false) => {
+        const { formRef = this.formRef } = this.props;
+        if (isSelect) {
+            formRef.current!.setFieldsValue({
+                [name]: optionList.map(item => item.value)
+            })
+        } else {
+            formRef.current!.setFieldsValue({
+                [name]: []
+            })
+        }
+    }
 
     componentDidMount(): void {
         this.resetFormatterMap();

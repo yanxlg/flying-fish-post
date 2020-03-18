@@ -16,11 +16,11 @@ const fieldsList: IFieldItem[] = [
         formatter: "number",
         optionList: [
             {
-                name: "1",
+                name: "aaa",
                 value: "1",
             },
             {
-                name: "2",
+                name: "bbb",
                 value: "2",
             },
         ],
