@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 
-import Mock, { Random } from "mockjs";
-import { Simulate } from "react-dom/test-utils";
+import Mock from "mockjs";
 
 const sleep = async (second: number) => {
     return new Promise(resolve => {
@@ -30,21 +29,21 @@ const returnList = Mock.mock({
 });
 
 const optionList = Mock.mock({
-    "logistics_mode_list|10-30": [
+    "logistics_mode_list|5": [
         {
-            "value|1": [0, 1, 2, 3, 4],
+            "value|+1": [0, 1, 2, 3, 4],
             "name": "@cword"
         }
     ],
-    "return_type_list|10-30": [
+    "return_type_list|5": [
         {
-            "value|1": [0, 1, 2, 3, 4],
+            "value|+1": [0, 1, 2, 3, 4],
             "name": "@cword"
         }
     ],
-    "return_platform_list|10-30": [
+    "return_platform_list|5": [
         {
-            "value|1": [0, 1, 2, 3, 4],
+            "value|+1": [0, 1, 2, 3, 4],
             "name": "@cword"
         }
     ],
@@ -79,6 +78,22 @@ export default {
             code: 200,
             message: "By mock.js",
             data: optionList
+        });
+    },
+    "GET /*/return/his_list": async (req: Request, res: Response) => {
+        const { page, page_count } = req.query;
+        const { list } = returnList;
+        await sleep(4);
+        res.status(200).send({
+            code: 200,
+            message: "By mock.js",
+            data: {
+                list: list.slice(
+                    Number(page_count) * Number(page - 1),
+                    Number(page_count) * Number(page)
+                ),
+                total: list.length
+            }
         });
     }
 };

@@ -14,7 +14,7 @@ export declare interface TableListItem {
     create_time: string;
 }
 
-export declare interface IFormItems {
+export declare interface IReturnRequestForm {
     number?: string;
     logistics_mode?: number;
     return_type?: number;

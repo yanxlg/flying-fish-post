@@ -17,6 +17,7 @@ const ProTable = <
     props: ProTableProps<T, U> & {
         bottom?: number;
         minHeight?: number;
+        children?: React.ReactElement;
     },
 ) => {
     const [filters, setFilters] = useState<Record<string, Key[] | null>>({});
@@ -78,14 +79,15 @@ const ProTable = <
     );
 
     return useMemo(() => {
-        const { pagination, scroll, ..._props } = props;
+        const { pagination, scroll, children, ..._props } = props;
         return (
             <Card className={cardStyle.cardPlain} ref={cardRef}>
+                {children}
                 <DefaultProTable<T, U>
                     {..._props}
                     pagination={false}
                     onChange={onDefaultChange}
-                    scroll={{ ...scroll, y: y }}
+                    scroll={{ ...scroll, y: y, x: scroll?.x || "max-content" }}
                 />
                 {pagination ? (
                     <Pagination
