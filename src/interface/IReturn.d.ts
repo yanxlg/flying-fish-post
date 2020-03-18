@@ -27,4 +27,5 @@ export interface IOptionListResponse {
     logistics_mode_list: IOptionItem[];
     return_type_list: IOptionItem[];
     return_platform_list: IOptionItem[];
+    status_list: IOptionItem[];
 }

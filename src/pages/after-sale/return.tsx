@@ -1,6 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { PageHeaderWrapper } from "@ant-design/pro-layout";
-import ProTable, { ProColumns } from "@ant-design/pro-table";
 import { Card } from "antd";
 import SearchForm, { IFieldItem } from "@/components/SearchForm";
 import formStyles from "@/styles/_form.less";
@@ -8,9 +7,57 @@ import btnStyles from "@/styles/_btn.less";
 import LoadingButton from "@/components/LoadingButton";
 import { IFormItems, TableListItem } from "@/interface/IReturn";
 import { queryReturnList, exportReturnList, queryOptionList } from "@/services/afterSale";
+import { optionListToMap } from "@/utils/utils";
+import ProTable from "@/components/ProTable";
 import { PaginationConfig } from "antd/es/pagination";
+import { ProColumns } from "@ant-design/pro-table";
+
+declare interface IOptionItemProps {
+    type: "logistics_mode" | "return_type" | "return_platform" | "status";
+    value: number;
+}
 
 const queryOptions = queryOptionList();
+
+const queryOptionMap = queryOptions.then(
+    ({
+        data: {
+            logistics_mode_list = [],
+            return_type_list = [],
+            return_platform_list = [],
+            status_list = [],
+        },
+    }) => {
+        return {
+            logisticsModeMap: optionListToMap(logistics_mode_list),
+            returnTypeMap: optionListToMap(return_type_list),
+            returnPlatformMap: optionListToMap(return_platform_list),
+            statusMap: optionListToMap(status_list),
+        };
+    },
+);
+
+const OptionItem: React.FC<IOptionItemProps> = ({ type, value }) => {
+    const [label, setLabel] = useState("");
+    useMemo(() => {
+        queryOptionMap.then(({ logisticsModeMap, returnTypeMap, returnPlatformMap, statusMap }) => {
+            setLabel(
+                type == "logistics_mode"
+                    ? logisticsModeMap[value]
+                    : type === "return_type"
+                    ? returnTypeMap[value]
+                    : type === "return_platform"
+                    ? returnPlatformMap[value]
+                    : type === "status"
+                    ? statusMap[value]
+                    : "",
+            );
+        });
+    }, []);
+    return useMemo(() => {
+        return <span>{label}</span>;
+    }, [label]);
+};
 
 const formConfig: IFieldItem<keyof IFormItems>[] = [
     {
@@ -81,16 +128,25 @@ const columns: ProColumns<TableListItem>[] = [
         title: "类型",
         dataIndex: "logistics_mode",
         align: "center",
+        render: (value: any) => {
+            return <OptionItem type="logistics_mode" value={value} />;
+        },
     },
     {
         title: "平台类型",
         dataIndex: "return_platform",
         align: "center",
+        render: (value: any) => {
+            return <OptionItem type="return_platform" value={value} />;
+        },
     },
     {
         title: "状态",
         dataIndex: "status",
         align: "center",
+        render: (value: any) => {
+            return <OptionItem type="status" value={value} />;
+        },
     },
     {
         title: "运单号",
@@ -131,7 +187,7 @@ const columns: ProColumns<TableListItem>[] = [
         title: "操作",
         dataIndex: "option",
         align: "center",
-        render: (_, record) => <></>,
+        render: (_, record: TableListItem) => <span>1</span>,
     },
 ];
 
@@ -148,6 +204,7 @@ const ReturnPage: React.FC = props => {
         page_count = pageSize,
     }: { page?: number; page_count?: number } = {}) => {
         const formValues = searchRef.current!.getFieldsValue();
+        setLoading(true);
         const query = {
             ...formValues,
             page: page,
@@ -170,28 +227,28 @@ const ReturnPage: React.FC = props => {
         return exportReturnList(query);
     };
 
-    const onSearch = useCallback(() => {
+    const onSearch = () => {
         return getListData({
             page: 1,
         });
-    }, []);
+    };
 
-    const onChange = useCallback(({ current, pageSize }: PaginationConfig) => {
+    const onChange = ({ current, pageSize }: PaginationConfig) => {
         getListData({
             page: current,
             page_count: pageSize,
         });
-    }, []);
+    };
 
-    const reload = useCallback(() => {
-        getListData();
-    }, []);
+    const reload = () => getListData();
 
+    // componentDidMount
     useEffect(() => {
         onSearch();
     }, []);
 
     return useMemo(() => {
+        console.log("render");
         return (
             <PageHeaderWrapper>
                 <Card
@@ -250,7 +307,7 @@ const ReturnPage: React.FC = props => {
                 />
             </PageHeaderWrapper>
         );
-    }, [dataSource, loading, pageNumber, pageSize, total]);
+    }, [loading]);
 };
 
 export default ReturnPage;

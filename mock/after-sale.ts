@@ -17,7 +17,7 @@ const returnList = Mock.mock({
             "number": "@string('number',10)",
             "logistics_mode|+1": [0, 1, 2, 3, 4],
             "return_platform|+1": [0, 1, 2, 3, 4],
-            "status|+1": [0, 1, 2, 3, 4],
+            "status|1": [0, 1, 2, 3, 4],
             "track_number": "@string('number',10)",
             "physical_channel": "@increment",
             "current_node": "@cword(6)",
@@ -32,19 +32,25 @@ const returnList = Mock.mock({
 const optionList = Mock.mock({
     "logistics_mode_list|10-30": [
         {
-            "value": "@increment(0)",
+            "value|1": [0, 1, 2, 3, 4],
             "name": "@cword"
         }
     ],
     "return_type_list|10-30": [
         {
-            "value": "@increment(0)",
+            "value|1": [0, 1, 2, 3, 4],
             "name": "@cword"
         }
     ],
     "return_platform_list|10-30": [
         {
-            "value": "@increment(0)",
+            "value|1": [0, 1, 2, 3, 4],
+            "name": "@cword"
+        }
+    ],
+    "status_list|5": [
+        {
+            "value|+1": [0, 1, 2, 3, 4],
             "name": "@cword"
         }
     ]
