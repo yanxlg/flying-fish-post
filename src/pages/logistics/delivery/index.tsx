@@ -1,31 +1,9 @@
 import React, { useMemo } from "react";
-import { Tabs, Card } from "antd";
+import { Tabs } from "antd";
 import { PageHeaderWrapper } from "@ant-design/pro-layout";
-import SearchForm, { IFieldItem } from "@/components/SearchForm";
+import OrderThree from "./components/OrderThree";
 
 import styles from "./delivery.less";
-import formStyles from "@/styles/_form.less";
-
-// <keyof IFormItems>
-const fieldsList: IFieldItem[] = [
-    {
-        label: "平台状态",
-        type: "shortcutSelect",
-        name: "status",
-        className: "select-default",
-        formatter: "number",
-        optionList: [
-            {
-                name: "aaa",
-                value: "1",
-            },
-            {
-                name: "bbb",
-                value: "2",
-            },
-        ],
-    },
-];
 
 const { TabPane } = Tabs;
 
@@ -34,26 +12,10 @@ const Delivery: React.FC = props => {
         return (
             <PageHeaderWrapper>
                 <Tabs type="card" className={styles.tabs}>
-                    {/* onChange={callback} */}
                     <TabPane tab="3PL订单-非平邮" key="1">
-                        <Card
-                            bordered={false}
-                            className={[formStyles.formItem, formStyles.formCard].join(" ")}
-                        >
-                            <SearchForm
-                                // ref={searchRef}
-                                fieldList={fieldsList}
-                                // initialValues={initialValues}
-                            >
-                                {/* <LoadingButton
-                                    type="primary"
-                                    className={btnStyles.btnGroup}
-                                    onClick={handleSearch}
-                                >
-                                    搜索
-                                </LoadingButton> */}
-                            </SearchForm>
-                        </Card>
+                        <div className={styles.wrap}>
+                            <OrderThree />
+                        </div>
                     </TabPane>
                     <TabPane tab="4PL订单" key="2">
                         Content of Tab Pane 2

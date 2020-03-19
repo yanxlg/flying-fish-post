@@ -98,7 +98,7 @@ export default class SearchForm extends React.PureComponent<ISearchFormProps, IS
     private loadOptions = () => {
         const { fieldList } = this.props;
         fieldList.forEach(field => {
-            if (field.type === "select") {
+            if (field.type === "select" || field.type === "shortcutSelect") {
                 const optionList = field.optionList;
                 if (typeof optionList === "function") {
                     const name = field.name as string;
@@ -572,6 +572,7 @@ export default class SearchForm extends React.PureComponent<ISearchFormProps, IS
             label,
             className = styles.formInput,
             formItemClassName = styles.formItem,
+            placeholder,
             // syncDefaultOption,
             // optionListDependence,
             onChange,
@@ -590,7 +591,6 @@ export default class SearchForm extends React.PureComponent<ISearchFormProps, IS
             : {};
 
         const { loading, optionList } = this.getOptionList(field);
-
         return (
             <Form.Item
                 key={String(name)}
@@ -602,23 +602,29 @@ export default class SearchForm extends React.PureComponent<ISearchFormProps, IS
                     mode="multiple"
                     className={className}
                     loading={loading}
+                    maxTagCount={4}
                     optionFilterProp="children"
+                    placeholder={placeholder}
                     {...eventProps}
                     dropdownRender={menu => (
                         <div>
                             {/* value={size} onChange={this.handleSizeChange} */}
                             <Radio.Group className={styles.formBtnGroup} value="">
-                                <Radio.Button 
-                                    value="1" 
+                                <Radio.Button
+                                    value="1"
                                     className={styles.formBtnItem}
-                                    onClick={() => this.selectOrCancelAll(name as string, optionList, true)}
+                                    onClick={() =>
+                                        this.selectOrCancelAll(name as string, optionList, true)
+                                    }
                                 >
                                     全选
                                 </Radio.Button>
-                                <Radio.Button  
-                                    value="0" 
+                                <Radio.Button
+                                    value="0"
                                     className={styles.formBtnItem}
-                                    onClick={() => this.selectOrCancelAll(name as string, optionList)}
+                                    onClick={() =>
+                                        this.selectOrCancelAll(name as string, optionList)
+                                    }
                                 >
                                     取消全选
                                 </Radio.Button>
@@ -760,18 +766,22 @@ export default class SearchForm extends React.PureComponent<ISearchFormProps, IS
         });
     };
 
-    private selectOrCancelAll = (name: string, optionList: IOptionItem[], isSelect: boolean = false) => {
+    private selectOrCancelAll = (
+        name: string,
+        optionList: IOptionItem[],
+        isSelect: boolean = false,
+    ) => {
         const { formRef = this.formRef } = this.props;
         if (isSelect) {
             formRef.current!.setFieldsValue({
-                [name]: optionList.map(item => item.value)
-            })
+                [name]: optionList.map(item => item.value),
+            });
         } else {
             formRef.current!.setFieldsValue({
-                [name]: []
-            })
+                [name]: [],
+            });
         }
-    }
+    };
 
     componentDidMount(): void {
         this.resetFormatterMap();
