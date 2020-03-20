@@ -184,7 +184,6 @@ function useList<T, Q extends IRequestPagination>(
 
     const onChange = useCallback(
         ({ current, pageSize }: PaginationConfig, filters, sorter) => {
-            console.log(sorter);
             const sorterConfig =
                 sorter && sorter.field
                     ? {

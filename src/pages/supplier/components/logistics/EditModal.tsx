@@ -28,7 +28,7 @@ const EditModal: React.FC<EditModalProps> = ({ visible, onCancel, queryOptions }
 
     const [optionLoading, setOptionLoading] = useState(false);
 
-    const form = Form.useForm()[0];
+    const [form] = Form.useForm();
     const beforeUpload = useCallback(() => {
         return false;
     }, []);
