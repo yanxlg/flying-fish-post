@@ -6,39 +6,46 @@ import formStyles from "@/styles/_form.less";
 import btnStyles from "@/styles/_btn.less";
 import LoadingButton from "@/components/LoadingButton";
 import ProTable from "@/components/ProTable";
-import { ProColumns } from "@ant-design/pro-table";
-import { exportLogisticsList, queryLogisticsList, queryOptionList } from "@/services/supplier";
-import { ILogistics, IOptionListResponse, ILogisticsRequestForm } from "@/interface/ISupplier";
+import {
+    queryChannelsList,
+    queryChannelsOptionsList,
+    setChannelActiveState,
+    removeChannel,
+    exportChannelsList,
+} from "@/services/supplier";
+import { IChannelsRequestForm, IChannel, IChannelsOptionListResponse } from "@/interface/ISupplier";
+import EditModal from "@/pages/supplier/components/channels/EditModal";
 import { PlusOutlined } from "@ant-design/icons";
-import { IResponse } from "@/interface/IGlobal";
+import { IBoolean, IResponse } from "@/interface/IGlobal";
 import OptionItem from "../../components/OptionItem";
-import EditModal from "@/pages/supplier/components/logistics/EditModal";
-import { useList } from "@/utils/hooks";
+import { bool, reverseBool } from "@/utils/utils";
+import { SettlementModes, SettlementModesCode } from "@/config/dictionaries/Supplier";
+import { IWrappedProColumns, useFilterTable, useList } from "@/utils/hooks";
+import PopConfirmLoadingButton from "@/components/PopConfirmLoadingButton";
 
 export const queryOptions = (() => {
-    let syncPromise: Promise<IResponse<IOptionListResponse>>;
+    let syncPromise: Promise<IResponse<IChannelsOptionListResponse>>;
     return () => {
         if (syncPromise) {
             return syncPromise;
         } else {
-            syncPromise = queryOptionList();
+            syncPromise = queryChannelsOptionsList();
         }
         return syncPromise;
     };
 })();
 
-const formConfig: IFieldItem<keyof ILogisticsRequestForm>[] = [
+const formConfig: IFieldItem<keyof IChannelsRequestForm>[] = [
     {
-        label: "物流商",
+        label: "渠道",
         type: "input",
         name: "keyword",
-        placeholder: "ID/中文名/英文名",
+        placeholder: "编码/名称/物流商/平台",
     },
 ];
 
-const LogisticsPage: React.FC = () => {
+const ChannelsPage: React.FC = () => {
     const searchRef = useRef<SearchForm>(null);
-    const [visible, setVisible] = useState<boolean | string>(false);
     const {
         loading,
         pageNumber,
@@ -48,14 +55,16 @@ const LogisticsPage: React.FC = () => {
         onSearch,
         onReload,
         onChange,
-    } = useList(searchRef, queryLogisticsList);
+    } = useList(searchRef, queryChannelsList);
+
+    const [visible, setVisible] = useState<boolean | string>(false);
 
     const exportTable = useCallback(() => {
         const query = searchRef.current!.getFieldsValue();
-        return exportLogisticsList(query);
+        return exportChannelsList(query);
     }, []);
 
-    const newLogistic = useCallback(() => {
+    const addChannel = useCallback(() => {
         setVisible(true);
     }, []);
 
@@ -68,42 +77,39 @@ const LogisticsPage: React.FC = () => {
         queryOptions(); // 获取分类
     }, []);
 
-    const editLogistic = useCallback((id: string) => {
+    const editChannel = useCallback((id: string) => {
         setVisible(id);
     }, []);
 
-    const columns = useMemo<ProColumns<ILogistics>[]>(() => {
+    const primaryColumns = useMemo<IWrappedProColumns<IChannel>[]>(() => {
         return [
             {
-                title: "物流商ID",
+                title: "渠道编码",
                 dataIndex: "id",
                 align: "center",
                 width: "150px",
             },
             {
-                title: "中文名",
+                title: "渠道名称",
                 dataIndex: "name",
                 align: "center",
                 width: "150px",
+                filterType: "input",
             },
             {
-                title: "英文名",
-                dataIndex: "name_en",
+                title: "渠道显示名称",
+                dataIndex: "show_name",
                 align: "center",
                 width: "150px",
             },
             {
-                title: "服务方式",
-                dataIndex: "service_method",
+                title: "渠道类型",
+                dataIndex: "type",
                 align: "center",
                 width: "150px",
                 render: (value: any) => {
                     return (
-                        <OptionItem
-                            syncCallback={queryOptions}
-                            type="service_method_list"
-                            value={value}
-                        />
+                        <OptionItem syncCallback={queryOptions} type="type_list" value={value} />
                     );
                 },
             },
@@ -138,41 +144,52 @@ const LogisticsPage: React.FC = () => {
                 },
             },
             {
-                title: "官网地址",
-                dataIndex: "home_page",
+                title: "平台",
+                dataIndex: "platform",
                 align: "center",
-                width: "200px",
-            },
-            {
-                title: "轨迹查询方式",
-                dataIndex: "track_query",
-                align: "center",
-                width: "150px",
+                width: "250px",
                 render: (value: any) => {
                     return (
                         <OptionItem
                             syncCallback={queryOptions}
-                            type="track_query_list"
+                            type="platform_list"
                             value={value}
                         />
                     );
                 },
             },
             {
-                title: "联系方式",
-                dataIndex: "phone_number",
+                title: "结算方式",
+                dataIndex: "settlement_mode",
                 align: "center",
                 width: "150px",
+                render: _ => SettlementModes[_ as SettlementModesCode],
             },
             {
-                title: "创建时间",
-                dataIndex: "create_time",
+                title: "是否启用",
+                dataIndex: "active",
                 align: "center",
                 width: "150px",
+                render: _ => bool(_ as IBoolean, "已启用", "未启用"),
             },
             {
-                title: "更新时间",
-                dataIndex: "update_time",
+                title: "物流商",
+                dataIndex: "logistic",
+                align: "center",
+                width: "150px",
+                render: (value: any) => {
+                    return (
+                        <OptionItem
+                            syncCallback={queryOptions}
+                            type="logistic_list"
+                            value={value}
+                        />
+                    );
+                },
+            },
+            {
+                title: "渠道Code",
+                dataIndex: "channel_code",
                 align: "center",
                 width: "150px",
             },
@@ -189,14 +206,14 @@ const LogisticsPage: React.FC = () => {
                 width: "150px",
             },
             {
-                title: "最近操作人",
-                dataIndex: "operator",
+                title: "物流地址",
+                dataIndex: "logistic_address",
                 align: "center",
                 width: "150px",
             },
             {
-                title: "合同",
-                dataIndex: "contract",
+                title: "创建时间",
+                dataIndex: "create_time",
                 align: "center",
                 width: "200px",
             },
@@ -204,17 +221,51 @@ const LogisticsPage: React.FC = () => {
                 title: "操作",
                 dataIndex: "opt",
                 align: "center",
-                width: "150px",
+                width: "180px",
+                fixed: "right",
                 render: (_, record) => {
+                    const active = record.active;
                     return (
-                        <Button type="link" onClick={() => editLogistic(record.id)}>
-                            编辑
-                        </Button>
+                        <>
+                            <PopConfirmLoadingButton
+                                popConfirmProps={{
+                                    title: bool(
+                                        active,
+                                        "确定要停用该渠道吗？",
+                                        "确定要启用该渠道吗",
+                                    ),
+                                    onConfirm: () =>
+                                        setChannelActiveState(record.id, reverseBool(active)),
+                                }}
+                                buttonProps={{
+                                    type: "link",
+                                    size: "small",
+                                    children: bool(active, "停用", "启用"),
+                                }}
+                            />
+                            <Button type="link" onClick={() => editChannel(record.id)} size="small">
+                                编辑
+                            </Button>
+                            <PopConfirmLoadingButton
+                                popConfirmProps={{
+                                    title: "确定要删除该渠道吗？",
+                                    onConfirm: () => removeChannel(record.id),
+                                    placement: "topRight",
+                                }}
+                                buttonProps={{
+                                    type: "link",
+                                    children: "删除",
+                                    size: "small",
+                                }}
+                            />
+                        </>
                     );
                 },
             },
         ];
     }, []);
+    const columns = useFilterTable<IChannel>(primaryColumns);
+
     return (
         <>
             {useMemo(() => {
@@ -242,7 +293,7 @@ const LogisticsPage: React.FC = () => {
                                 </LoadingButton>
                             </SearchForm>
                         </Card>
-                        <ProTable<ILogistics>
+                        <ProTable<IChannel>
                             search={false}
                             headerTitle="查询表格"
                             rowKey="id"
@@ -254,7 +305,7 @@ const LogisticsPage: React.FC = () => {
                                 pageSizeOptions: ["50", "100", "200"],
                             }}
                             toolBarRender={(action, { selectedRows }) => [
-                                <Button type="primary" onClick={newLogistic}>
+                                <Button type="primary" onClick={addChannel}>
                                     <PlusOutlined />
                                     新建
                                 </Button>,
@@ -291,4 +342,4 @@ const LogisticsPage: React.FC = () => {
     );
 };
 
-export default LogisticsPage;
+export default ChannelsPage;

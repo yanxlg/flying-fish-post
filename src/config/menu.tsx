@@ -70,11 +70,11 @@ export default [
                 name: "物流商管理",
             },
             {
-                path: "/supplier/channel",
+                path: "/supplier/channels",
                 name: "渠道管理",
             },
             {
-                path: "/supplier/offer",
+                path: "/supplier/offers",
                 name: "渠道报价",
             },
             {

@@ -1,7 +1,7 @@
 import { parse } from "querystring";
 import pathRegexp from "path-to-regexp";
 import { Route } from "@/models/connect";
-import { IOptionItem } from "@/interface/IGlobal";
+import { IBoolean, IOptionItem } from "@/interface/IGlobal";
 import { returnAtIndex } from "lodash-decorators/utils";
 
 /* eslint no-useless-escape:0 import/prefer-default-export:0 */
@@ -72,4 +72,15 @@ export const optionListToMap = (options: IOptionItem[]) => {
         map[value] = name;
     });
     return map;
+};
+
+export const bool = (bool: IBoolean, truString: string, falseString: string) => {
+    return bool === 1 ? truString : falseString;
+};
+
+export const Truth = 1;
+export const False = 0;
+
+export const reverseBool = (bool: IBoolean) => {
+    return bool === 0 ? 1 : 0;
 };

@@ -1,11 +1,17 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { optionListToMap } from "@/utils/utils";
 import { IResponse } from "@/interface/IGlobal";
+import Highlighter from "react-highlight-words";
+import styles from "@/styles/_table.less";
 
 declare interface IOptionItemProps<T> {
     type: string;
     value: number;
     syncCallback: ISyncCallback;
+    filter?: boolean;
+    filterText?: string;
+    record?: any;
+    recordKey?: string;
 }
 
 declare type ISyncCallback = (() => Promise<IResponse<any>>) & {
@@ -33,16 +39,36 @@ const queryOptionMap = (() => {
     };
 })();
 
-const OptionItem = <T,>({ type, value, syncCallback }: IOptionItemProps<T>) => {
+const OptionItem = <T,>({
+    filterText = "",
+    filter,
+    type,
+    value,
+    syncCallback,
+    record,
+    recordKey,
+}: IOptionItemProps<T>) => {
     const [label, setLabel] = useState("");
-    useMemo(() => {
+    useEffect(() => {
         queryOptionMap(syncCallback).then(data => {
             setLabel(data?.[type]?.[value]);
         });
     }, []);
     return useMemo(() => {
-        return <span>{label}</span>;
-    }, [label]);
+        if (record && recordKey) {
+            record["__" + recordKey] = label;
+        }
+        return filter ? (
+            <Highlighter
+                highlightClassName={styles.tableHighlight}
+                searchWords={[filterText]}
+                autoEscape
+                textToHighlight={label.toString()}
+            />
+        ) : (
+            <span>{label}</span>
+        );
+    }, [label, filterText]);
 };
 
 export default OptionItem;

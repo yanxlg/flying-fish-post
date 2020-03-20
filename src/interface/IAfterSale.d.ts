@@ -21,6 +21,7 @@ export declare interface IReturnRequestForm {
     return_platform?: number;
     create_time_start?: number;
     create_time_end?: number;
+    tabType?: number;
 }
 
 export interface IOptionListResponse {
