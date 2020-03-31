@@ -1,12 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { PageHeaderWrapper } from "@ant-design/pro-layout";
 import { Button, Card } from "antd";
-import SearchForm, { IFieldItem } from "@/components/SearchForm";
-import formStyles from "@/styles/_form.less";
+import SearchForm, { FormField, SearchFormRef } from "@/components/SearchForm";
+import formStyles from "@/components/SearchForm/_form.less";
 import btnStyles from "@/styles/_btn.less";
 import LoadingButton from "@/components/LoadingButton";
-import ProTable from "@/components/ProTable";
-import { ProColumns } from "@ant-design/pro-table";
 import { exportLogisticsList, queryLogisticsList, queryOptionList } from "@/services/supplier";
 import { ILogistics, IOptionListResponse, ILogisticsRequestForm } from "@/interface/ISupplier";
 import { PlusOutlined } from "@ant-design/icons";
@@ -14,6 +12,7 @@ import { IResponse } from "@/interface/IGlobal";
 import OptionItem from "../../components/OptionItem";
 import EditModal from "@/pages/supplier/components/logistics/EditModal";
 import { useList } from "@/utils/hooks";
+import ProTable, { ProColumns } from "@/components/OptimizeProTable";
 
 export const queryOptions = (() => {
     let syncPromise: Promise<IResponse<IOptionListResponse>>;
@@ -27,17 +26,18 @@ export const queryOptions = (() => {
     };
 })();
 
-const formConfig: IFieldItem<keyof ILogisticsRequestForm>[] = [
+const formConfig: FormField<keyof ILogisticsRequestForm>[] = [
     {
         label: "物流商",
         type: "input",
         name: "keyword",
         placeholder: "ID/中文名/英文名",
+        formItemClassName: formStyles.formItem,
     },
 ];
 
 const LogisticsPage: React.FC = () => {
-    const searchRef = useRef<SearchForm>(null);
+    const searchRef = useRef<SearchFormRef>(null);
     const [visible, setVisible] = useState<boolean | string>(false);
     const {
         loading,
@@ -48,7 +48,7 @@ const LogisticsPage: React.FC = () => {
         onSearch,
         onReload,
         onChange,
-    } = useList(searchRef, queryLogisticsList);
+    } = useList({ formRef: searchRef, queryList: queryLogisticsList });
 
     const exportTable = useCallback(() => {
         const query = searchRef.current!.getFieldsValue();
@@ -226,6 +226,7 @@ const LogisticsPage: React.FC = () => {
                         >
                             <SearchForm
                                 fieldList={formConfig}
+                                enableCollapse={false}
                                 ref={searchRef}
                                 initialValues={{
                                     logistics_mode: "",
@@ -243,7 +244,7 @@ const LogisticsPage: React.FC = () => {
                             </SearchForm>
                         </Card>
                         <ProTable<ILogistics>
-                            search={false}
+                            className={formStyles.formItem}
                             headerTitle="查询表格"
                             rowKey="id"
                             pagination={{
@@ -253,7 +254,7 @@ const LogisticsPage: React.FC = () => {
                                 showSizeChanger: true,
                                 pageSizeOptions: ["50", "100", "200"],
                             }}
-                            toolBarRender={(action, { selectedRows }) => [
+                            toolBarRender={() => [
                                 <Button type="primary" onClick={newLogistic}>
                                     <PlusOutlined />
                                     新建
@@ -262,12 +263,6 @@ const LogisticsPage: React.FC = () => {
                                     批量导出
                                 </LoadingButton>,
                             ]}
-                            tableAlertRender={(selectedRowKeys, selectedRows) => (
-                                <div>
-                                    已选择{" "}
-                                    <a style={{ fontWeight: 600 }}>{selectedRowKeys.length}</a> 项
-                                </div>
-                            )}
                             columns={columns}
                             dataSource={dataSource}
                             loading={loading}

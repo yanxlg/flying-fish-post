@@ -1,11 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { PageHeaderWrapper } from "@ant-design/pro-layout";
 import { Button, Card } from "antd";
-import SearchForm, { IFieldItem } from "@/components/SearchForm";
-import formStyles from "@/styles/_form.less";
+import SearchForm, { FormField, SearchFormRef } from "@/components/SearchForm";
+import formStyles from "@/components/SearchForm/_form.less";
 import btnStyles from "@/styles/_btn.less";
 import LoadingButton from "@/components/LoadingButton";
-import ProTable from "@/components/ProTable";
 import {
     queryChannelsList,
     queryChannelsOptionsList,
@@ -22,6 +21,7 @@ import { bool, reverseBool } from "@/utils/utils";
 import { SettlementModes, SettlementModesCode } from "@/config/dictionaries/Supplier";
 import { IWrappedProColumns, useFilterTable, useList } from "@/utils/hooks";
 import PopConfirmLoadingButton from "@/components/PopConfirmLoadingButton";
+import ProTable from "@/components/OptimizeProTable";
 
 export const queryOptions = (() => {
     let syncPromise: Promise<IResponse<IChannelsOptionListResponse>>;
@@ -35,17 +35,18 @@ export const queryOptions = (() => {
     };
 })();
 
-const formConfig: IFieldItem<keyof IChannelsRequestForm>[] = [
+const formConfig: FormField<keyof IChannelsRequestForm>[] = [
     {
         label: "渠道",
         type: "input",
         name: "keyword",
         placeholder: "编码/名称/物流商/平台",
+        formItemClassName: formStyles.formItem,
     },
 ];
 
 const ChannelsPage: React.FC = () => {
-    const searchRef = useRef<SearchForm>(null);
+    const searchRef = useRef<SearchFormRef>(null);
     const {
         loading,
         pageNumber,
@@ -55,7 +56,10 @@ const ChannelsPage: React.FC = () => {
         onSearch,
         onReload,
         onChange,
-    } = useList(searchRef, queryChannelsList);
+    } = useList({
+        queryList: queryChannelsList,
+        formRef: searchRef,
+    });
 
     const [visible, setVisible] = useState<boolean | string>(false);
 
@@ -276,6 +280,7 @@ const ChannelsPage: React.FC = () => {
                             className={[formStyles.formItem, formStyles.formCard].join(" ")}
                         >
                             <SearchForm
+                                enableCollapse={false}
                                 fieldList={formConfig}
                                 ref={searchRef}
                                 initialValues={{
@@ -294,7 +299,7 @@ const ChannelsPage: React.FC = () => {
                             </SearchForm>
                         </Card>
                         <ProTable<IChannel>
-                            search={false}
+                            className={formStyles.formItem}
                             headerTitle="查询表格"
                             rowKey="id"
                             pagination={{
@@ -304,7 +309,7 @@ const ChannelsPage: React.FC = () => {
                                 showSizeChanger: true,
                                 pageSizeOptions: ["50", "100", "200"],
                             }}
-                            toolBarRender={(action, { selectedRows }) => [
+                            toolBarRender={() => [
                                 <Button type="primary" onClick={addChannel}>
                                     <PlusOutlined />
                                     新建
@@ -313,12 +318,6 @@ const ChannelsPage: React.FC = () => {
                                     批量导出
                                 </LoadingButton>,
                             ]}
-                            tableAlertRender={(selectedRowKeys, selectedRows) => (
-                                <div>
-                                    已选择{" "}
-                                    <a style={{ fontWeight: 600 }}>{selectedRowKeys.length}</a> 项
-                                </div>
-                            )}
                             columns={columns}
                             dataSource={dataSource}
                             loading={loading}

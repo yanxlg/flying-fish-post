@@ -1,56 +1,53 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import { Table } from 'antd';
-import { TableProps } from 'antd/lib/table';
-import { Bind, Debounce } from 'lodash-decorators';
-
-declare interface IFitTableState {
-    y?: number;
-}
+import React, { useMemo, useRef } from "react";
+import { Table, Button } from "antd";
+import { TableProps } from "antd/lib/table";
+import { useScrollXY } from "@/components/OptimizeProTable/hooks";
+import btnStyle from "@/styles/_btn.less";
 
 declare interface IFitTableProps<T> extends TableProps<T> {
     bottom?: number;
     minHeight?: number;
+    autoFitY?: boolean;
 }
 
-class FitTable<T extends object> extends React.PureComponent<IFitTableProps<T>, IFitTableState> {
-    constructor(props: TableProps<T>) {
-        super(props);
-        this.state = {
-            y: undefined,
-        };
-    }
+export const showTotal = (total: number) => {
+    return <span>共有{total}条</span>;
+};
 
-    componentDidMount(): void {
-        // 计算高度
-        this.resizeHeight();
-        window.addEventListener('resize', this.resizeHeight);
-    }
-    componentWillUnmount(): void {
-        window.removeEventListener('resize', this.resizeHeight);
-    }
-    @Bind
-    @Debounce(300)
-    private resizeHeight() {
-        const el = ReactDOM.findDOMNode(this) as Element;
-        const { bottom = 0, minHeight } = this.props;
-        const height = document.body.offsetHeight - el.getBoundingClientRect().top - bottom;
-        if ((!minHeight || height >= minHeight) && height > 0) {
-            this.setState({
-                y: height,
-            });
-        } else if (minHeight) {
-            this.setState({
-                y: minHeight,
-            });
-        }
-    }
+export const goButton = <Button className={btnStyle.btnGo}>Go</Button>;
 
-    render() {
-        const { scroll, ...props } = this.props;
-        const { y } = this.state;
-        return <Table<T> {...props} scroll={{ ...scroll, y: y }} />;
-    }
+function FitTable<T extends object>({
+    bottom = 0,
+    minHeight = 500,
+    autoFitY = true,
+    columns = [],
+    rowSelection,
+    scroll: propsScroll,
+    ...props
+}: IFitTableProps<T>) {
+    const ref = useRef<HTMLDivElement>(null);
+    const scroll = useScrollXY(
+        ref,
+        bottom,
+        minHeight,
+        autoFitY,
+        columns,
+        rowSelection,
+        propsScroll,
+    );
+
+    return useMemo(() => {
+        return (
+            <div ref={ref}>
+                <Table<T>
+                    scroll={scroll}
+                    columns={columns}
+                    rowSelection={rowSelection}
+                    {...props}
+                />
+            </div>
+        );
+    }, [props, propsScroll, rowSelection, columns]);
 }
 
 export { FitTable };

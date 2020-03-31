@@ -1,28 +1,22 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef } from "react";
 import { PageHeaderWrapper } from "@ant-design/pro-layout";
 import { Card } from "antd";
-import SearchForm, { IFieldItem } from "@/components/SearchForm";
-import formStyles from "@/styles/_form.less";
-import btnStyles from "@/styles/_btn.less";
+import SearchForm, { FormField, SearchFormRef } from "@/components/SearchForm";
+import formStyles from "@/components/SearchForm/_form.less";
 import LoadingButton from "@/components/LoadingButton";
 import { IReturnRequestForm, TableListItem } from "@/interface/IAfterSale";
-import {
-    queryHistoryReturnList,
-    exportHistoryReturnList,
-    queryReturnList,
-} from "@/services/afterSale";
-import ProTable from "@/components/ProTable";
-import { PaginationConfig } from "antd/es/pagination";
-import { ProColumns } from "@ant-design/pro-table";
+import { queryHistoryReturnList, exportHistoryReturnList } from "@/services/afterSale";
+import ProTable, { ProColumns } from "@/components/OptimizeProTable";
 import { queryOptions } from "@/pages/after-sale/return";
 import OptionItem from "@/components/OptionItem";
 import { useList } from "@/utils/hooks";
 
-const formConfig: IFieldItem<keyof IReturnRequestForm>[] = [
+const formConfig: FormField<keyof IReturnRequestForm>[] = [
     {
         label: "单号",
         type: "input",
         name: "number",
+        formItemClassName: formStyles.formItem,
     },
     {
         label: "物流方式",
@@ -38,6 +32,7 @@ const formConfig: IFieldItem<keyof IReturnRequestForm>[] = [
                 return logistics_mode_list;
             });
         },
+        formItemClassName: formStyles.formItem,
     },
     {
         label: "退货类型",
@@ -53,6 +48,7 @@ const formConfig: IFieldItem<keyof IReturnRequestForm>[] = [
                 return return_type_list;
             });
         },
+        formItemClassName: formStyles.formItem,
     },
     {
         label: "退货平台",
@@ -68,12 +64,14 @@ const formConfig: IFieldItem<keyof IReturnRequestForm>[] = [
                 return return_type_list;
             });
         },
+        formItemClassName: formStyles.formItem,
     },
     {
         label: "创建时间",
         type: "dateRanger",
         name: ["create_time_start", "create_time_end"],
         formatter: ["start_date", "end_date"],
+        formItemClassName: formStyles.formItem,
     },
 ];
 
@@ -167,7 +165,7 @@ const columns: ProColumns<TableListItem>[] = [
 ];
 
 const HistoryPage: React.FC = props => {
-    const searchRef = useRef<SearchForm>(null);
+    const searchRef = useRef<SearchFormRef>(null);
 
     const {
         loading,
@@ -178,7 +176,10 @@ const HistoryPage: React.FC = props => {
         onSearch,
         onReload,
         onChange,
-    } = useList(searchRef, queryHistoryReturnList);
+    } = useList({
+        queryList: queryHistoryReturnList,
+        formRef: searchRef,
+    });
 
     const exportTable = useCallback(() => {
         const query = searchRef.current!.getFieldsValue();
@@ -200,9 +201,10 @@ const HistoryPage: React.FC = props => {
                             return_type: "",
                             return_platform: "",
                         }}
+                        enableCollapse={false}
                     >
                         <LoadingButton
-                            className={btnStyles.btnGroup}
+                            className={formStyles.formItem}
                             type="primary"
                             onClick={onSearch}
                         >
@@ -211,8 +213,8 @@ const HistoryPage: React.FC = props => {
                     </SearchForm>
                 </Card>
                 <ProTable<TableListItem>
-                    search={false}
                     headerTitle="查询表格"
+                    className={formStyles.formItem}
                     rowKey="number"
                     pagination={{
                         total: total,
@@ -221,16 +223,12 @@ const HistoryPage: React.FC = props => {
                         showSizeChanger: true,
                         pageSizeOptions: ["50", "100", "200"],
                     }}
-                    toolBarRender={(action, { selectedRows }) => [
+                    toolBarRender={() => [
                         <LoadingButton type="primary" onClick={exportTable}>
                             批量导出
                         </LoadingButton>,
                     ]}
-                    tableAlertRender={(selectedRowKeys, selectedRows) => (
-                        <div>
-                            已选择 <a style={{ fontWeight: 600 }}>{selectedRowKeys.length}</a> 项
-                        </div>
-                    )}
+                    tableAlertRender={false}
                     columns={columns}
                     dataSource={dataSource}
                     loading={loading}

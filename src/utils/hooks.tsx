@@ -1,26 +1,26 @@
-import { ProColumns } from "@ant-design/pro-table";
-import React, { RefObject, useCallback, useEffect, useMemo, useState } from "react";
+import React, { RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Button, Input } from "antd";
 import { FilterDropdownProps } from "antd/es/table/interface";
 import { SearchOutlined } from "@ant-design/icons/lib";
 import Highlighter from "react-highlight-words";
-import SearchForm from "@/components/SearchForm";
+import { SearchFormRef } from "@/components/SearchForm";
 import { IPaginationResponse, IRequestPagination, IResponse } from "@/interface/IGlobal";
 import { PaginationConfig } from "antd/es/pagination";
-import { RequestData, UseFetchDataAction } from "@ant-design/pro-table/lib/useFetchData";
 
 import styles from "@/styles/_table.less";
+import { defaultPageNumber, defaultPageSize, EmptyObject } from "@/config/global";
+import { ProColumns } from "@/components/OptimizeProTable";
+const EmptyArray: string[] = [];
 
-export declare interface IWrappedProColumns<T> extends ProColumns<T> {
+export type IWrappedProColumns<T> = Omit<ProColumns<T>, "render"> & {
     filterType?: "input";
     render?: (
         text: React.ReactNode,
         record: T,
         index: number,
-        action: UseFetchDataAction<RequestData<T>>,
         filterText?: string,
     ) => React.ReactNode | React.ReactNode[];
-}
+};
 
 function useFilterTable<T>(columns: IWrappedProColumns<T>[]): ProColumns<T>[] {
     const [search, setSearch] = useState<{ searchText: string; searchedColumn: string }>({
@@ -112,7 +112,7 @@ function useFilterTable<T>(columns: IWrappedProColumns<T>[]): ProColumns<T>[] {
                     render: (text: any, record: T, index: number, action) =>
                         search.searchedColumn === dataIndex ? (
                             render ? (
-                                render(text, record, index, action, search.searchText)
+                                render(text, record, index, search.searchText)
                             ) : (
                                 <Highlighter
                                     highlightClassName={styles.tableHighlight}
@@ -122,7 +122,7 @@ function useFilterTable<T>(columns: IWrappedProColumns<T>[]): ProColumns<T>[] {
                                 />
                             )
                         ) : (
-                            render?.(text, record, index, action) ?? text
+                            render?.(text, record, index) ?? text
                         ),
                 };
             } else {
@@ -132,94 +132,147 @@ function useFilterTable<T>(columns: IWrappedProColumns<T>[]): ProColumns<T>[] {
     }, [columns]);
 }
 
-function useList<T, Q extends IRequestPagination>(
-    searchRef: RefObject<SearchForm>,
-    queryList: (query: Q) => Promise<IResponse<IPaginationResponse<T>>>,
-    extraQuery?: { [key: string]: any },
-) {
-    const [loading, setLoading] = useState(true);
-    const [pageNumber, setPageNumber] = useState(1);
-    const [pageSize, setPageSize] = useState(50);
+function useList<T, Q extends IRequestPagination = any, S = any>({
+    queryList,
+    formRef,
+    extraQuery,
+    defaultState,
+    autoQuery = true,
+}: {
+    queryList: (query: Q) => Promise<IResponse<IPaginationResponse<T>>>;
+    formRef?: RefObject<SearchFormRef>;
+    extraQuery?: { [key: string]: any };
+    defaultState?: { pageNumber?: number; pageSize?: number };
+    autoQuery?: boolean;
+}) {
+    const [loading, setLoading] = useState(autoQuery);
+
+    const extraQueryRef = useRef<{ [key: string]: any } | undefined>(undefined);
+    extraQueryRef.current = extraQuery;
+
+    const pageNumber = useRef<number>(defaultState?.pageNumber ?? defaultPageNumber);
+    const pageSize = useRef<number>(defaultState?.pageSize ?? defaultPageSize);
+
     const [dataSource, setDataSource] = useState<T[]>([]);
     const [total, setTotal] = useState(0);
+    const [extraData, setExtraData] = useState<S | undefined>(undefined);
+    const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>(EmptyArray);
+
+    const query = useRef<object>({});
+    const setQuery = useCallback((nextQuery: object) => {
+        query.current = nextQuery;
+    }, []);
 
     const getListData = useCallback(
         ({
-            page = pageNumber,
-            page_count = pageSize,
+            page = pageNumber.current,
+            page_count = pageSize.current,
             ...extra
         }: { page?: number; page_count?: number; [key: string]: any } = {}) => {
-            const formValues = searchRef.current!.getFieldsValue();
-            setLoading(true);
-            const query = {
-                ...formValues,
-                page: page,
-                page_count: page_count,
-                ...extra,
-            };
-            return queryList(query as Q)
-                .then(({ data: { list = [], total = 0 } }) => {
-                    setDataSource(list);
-                    setTotal(total);
-                    setPageNumber(page);
-                    setPageSize(page_count);
+            return Promise.resolve()
+                .then(() => {
+                    return formRef ? formRef.current!.validateFields() : undefined;
                 })
-                .finally(() => {
-                    setLoading(false);
+                .then(formValues => {
+                    setLoading(true);
+                    const query = {
+                        page: page,
+                        page_count: page_count,
+                        ...extra,
+                        ...formValues,
+                    };
+                    setQuery(query);
+                    setSelectedRowKeys(EmptyArray);
+                    return queryList(query as Q)
+                        .then(({ data: { total = 0, list = [], ...extraData } = EmptyObject }) => {
+                            pageNumber.current = page;
+                            pageSize.current = page_count;
+                            setDataSource(list);
+                            setTotal(total);
+                            setExtraData(extraData);
+                        })
+                        .finally(() => {
+                            setLoading(false);
+                        });
                 });
         },
-        [pageNumber, pageSize],
+        [],
     );
 
-    const onReload = useCallback(() => getListData(), [pageNumber, pageSize]);
+    const onReload = useCallback(
+        () =>
+            getListData({
+                ...extraQueryRef.current,
+            }),
+        [],
+    );
 
     const onSearch = useCallback(
         () =>
             getListData({
                 page: 1,
-                ...extraQuery,
+                page_count: defaultState?.pageSize ?? defaultPageSize,
+                ...extraQueryRef.current,
             }),
-        [pageNumber, pageSize, extraQuery],
+        [],
     );
 
-    const onChange = useCallback(
-        ({ current, pageSize }: PaginationConfig, filters, sorter) => {
-            const sorterConfig =
-                sorter && sorter.field
-                    ? {
-                          sort_by: sorter.field,
-                          sort_order: sorter.order,
-                      }
-                    : {};
-            getListData({
-                page: current,
-                page_count: pageSize,
-                ...sorterConfig,
-                ...extraQuery,
-            });
-        },
-        [extraQuery],
-    );
+    const onChange = useCallback(({ current, pageSize }: PaginationConfig, filters, sorter) => {
+        const sorterConfig =
+            sorter && sorter.field
+                ? {
+                      sort_by: sorter.field,
+                      sort_order: sorter.order,
+                  }
+                : {};
+        getListData({
+            page: current,
+            page_count: pageSize,
+            ...sorterConfig,
+            ...extraQueryRef.current,
+        });
+    }, []);
 
     useEffect(() => {
-        onSearch();
+        if (autoQuery) {
+            // 有些场景可能不需要立即调用接口，添加参数控制，默认为true
+            onSearch();
+        }
+    }, []);
+
+    const setPageSize = useCallback((size: number) => {
+        pageSize.current = size;
+    }, []);
+
+    const setPageNumber = useCallback((current: number) => {
+        pageNumber.current = current;
     }, []);
 
     return {
+        get query() {
+            return query.current;
+        },
+        get pageNumber() {
+            return pageNumber.current;
+        },
+        get pageSize() {
+            return pageSize.current;
+        },
         loading,
-        pageNumber,
-        pageSize,
         dataSource,
+        extraData,
         total,
         setLoading,
-        setPageNumber,
-        setPageSize,
         setDataSource,
+        selectedRowKeys,
         setTotal,
         onReload,
         onSearch,
         onChange,
         getListData,
+        setSelectedRowKeys,
+        setPageSize,
+        setPageNumber,
     };
 }
 
