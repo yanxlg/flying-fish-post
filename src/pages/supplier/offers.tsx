@@ -316,7 +316,7 @@ const ChannelsPage: React.FC = () => {
                                 }}
                             >
                                 <LoadingButton
-                                    className={btnStyles.btnGroup}
+                                    className={formStyles.formItem}
                                     type="primary"
                                     onClick={onSearch}
                                 >
