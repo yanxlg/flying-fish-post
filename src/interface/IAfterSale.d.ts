@@ -14,13 +14,14 @@ export declare interface TableListItem {
     create_time: string;
 }
 
-export declare interface IFormItems {
+export declare interface IReturnRequestForm {
     number?: string;
     logistics_mode?: number;
     return_type?: number;
     return_platform?: number;
     create_time_start?: number;
     create_time_end?: number;
+    tabType?: number;
 }
 
 export interface IOptionListResponse {

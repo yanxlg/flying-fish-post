@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ProTableProps } from "@ant-design/pro-table/lib/Table";
-import { default as DefaultProTable, ProColumns } from "@ant-design/pro-table";
+import { default as DefaultProTable } from "@ant-design/pro-table";
 import { Card, Pagination } from "antd";
 import { Key, SorterResult, TableCurrentDataSource } from "antd/es/table/interface";
 import { PaginationConfig } from "antd/es/pagination";
@@ -17,6 +17,7 @@ const ProTable = <
     props: ProTableProps<T, U> & {
         bottom?: number;
         minHeight?: number;
+        children?: React.ReactElement;
     },
 ) => {
     const [filters, setFilters] = useState<Record<string, Key[] | null>>({});
@@ -48,9 +49,10 @@ const ProTable = <
         };
     }, []);
 
+    // sorter,filter会触发
     const onDefaultChange = useCallback(
         (
-            pagination: PaginationConfig,
+            _pagination: PaginationConfig,
             filters: Record<string, Key[] | null>,
             sorter: SorterResult<T> | SorterResult<T>[],
             extra: TableCurrentDataSource<T>,
@@ -58,6 +60,13 @@ const ProTable = <
             setFilters(filters);
             setSorters(sorter);
             setExtra(extra);
+            const { pagination } = props;
+            props.onChange?.(
+                pagination ? { pageSize: pagination.pageSize, current: pagination.current } : {},
+                filters,
+                sorter,
+                extra,
+            );
         },
         [],
     );
@@ -78,14 +87,15 @@ const ProTable = <
     );
 
     return useMemo(() => {
-        const { pagination, scroll, ..._props } = props;
+        const { pagination, scroll, children, ..._props } = props;
         return (
             <Card className={cardStyle.cardPlain} ref={cardRef}>
+                {children}
                 <DefaultProTable<T, U>
                     {..._props}
                     pagination={false}
                     onChange={onDefaultChange}
-                    scroll={{ ...scroll, y: y }}
+                    scroll={{ ...scroll, y: y, x: scroll?.x || "max-content" }}
                 />
                 {pagination ? (
                     <Pagination

@@ -1,65 +1,31 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { PageHeaderWrapper } from "@ant-design/pro-layout";
-import { Card } from "antd";
+import { Card, Tabs } from "antd";
 import SearchForm, { IFieldItem } from "@/components/SearchForm";
 import formStyles from "@/styles/_form.less";
 import btnStyles from "@/styles/_btn.less";
 import LoadingButton from "@/components/LoadingButton";
-import { IFormItems, TableListItem } from "@/interface/IReturn";
+import { IReturnRequestForm, IOptionListResponse, TableListItem } from "@/interface/IAfterSale";
 import { queryReturnList, exportReturnList, queryOptionList } from "@/services/afterSale";
-import { optionListToMap } from "@/utils/utils";
 import ProTable from "@/components/ProTable";
-import { PaginationConfig } from "antd/es/pagination";
 import { ProColumns } from "@ant-design/pro-table";
+import { IResponse } from "@/interface/IGlobal";
+import OptionItem from "@/components/OptionItem";
+import { useList } from "@/utils/hooks";
 
-declare interface IOptionItemProps {
-    type: "logistics_mode" | "return_type" | "return_platform" | "status";
-    value: number;
-}
+export const queryOptions = (() => {
+    let syncPromise: Promise<IResponse<IOptionListResponse>>;
+    return () => {
+        if (syncPromise) {
+            return syncPromise;
+        } else {
+            syncPromise = queryOptionList();
+        }
+        return syncPromise;
+    };
+})();
 
-const queryOptions = queryOptionList();
-
-const queryOptionMap = queryOptions.then(
-    ({
-        data: {
-            logistics_mode_list = [],
-            return_type_list = [],
-            return_platform_list = [],
-            status_list = [],
-        },
-    }) => {
-        return {
-            logisticsModeMap: optionListToMap(logistics_mode_list),
-            returnTypeMap: optionListToMap(return_type_list),
-            returnPlatformMap: optionListToMap(return_platform_list),
-            statusMap: optionListToMap(status_list),
-        };
-    },
-);
-
-const OptionItem: React.FC<IOptionItemProps> = ({ type, value }) => {
-    const [label, setLabel] = useState("");
-    useMemo(() => {
-        queryOptionMap.then(({ logisticsModeMap, returnTypeMap, returnPlatformMap, statusMap }) => {
-            setLabel(
-                type == "logistics_mode"
-                    ? logisticsModeMap[value]
-                    : type === "return_type"
-                    ? returnTypeMap[value]
-                    : type === "return_platform"
-                    ? returnPlatformMap[value]
-                    : type === "status"
-                    ? statusMap[value]
-                    : "",
-            );
-        });
-    }, []);
-    return useMemo(() => {
-        return <span>{label}</span>;
-    }, [label]);
-};
-
-const formConfig: IFieldItem<keyof IFormItems>[] = [
+const formConfig: IFieldItem<keyof IReturnRequestForm>[] = [
     {
         label: "单号",
         type: "input",
@@ -75,7 +41,7 @@ const formConfig: IFieldItem<keyof IFormItems>[] = [
             value: "",
         },
         optionList: () => {
-            return queryOptions.then(({ data: { logistics_mode_list = [] } }) => {
+            return queryOptions().then(({ data: { logistics_mode_list = [] } }) => {
                 return logistics_mode_list;
             });
         },
@@ -90,7 +56,7 @@ const formConfig: IFieldItem<keyof IFormItems>[] = [
             value: "",
         },
         optionList: () => {
-            return queryOptions.then(({ data: { return_type_list = [] } }) => {
+            return queryOptions().then(({ data: { return_type_list = [] } }) => {
                 return return_type_list;
             });
         },
@@ -105,7 +71,7 @@ const formConfig: IFieldItem<keyof IFormItems>[] = [
             value: "",
         },
         optionList: () => {
-            return queryOptions.then(({ data: { return_type_list = [] } }) => {
+            return queryOptions().then(({ data: { return_type_list = [] } }) => {
                 return return_type_list;
             });
         },
@@ -123,132 +89,133 @@ const columns: ProColumns<TableListItem>[] = [
         title: "单号",
         dataIndex: "number",
         align: "center",
+        width: "150px",
     },
     {
         title: "类型",
         dataIndex: "logistics_mode",
         align: "center",
+        width: "120px",
         render: (value: any) => {
-            return <OptionItem type="logistics_mode" value={value} />;
+            return (
+                <OptionItem syncCallback={queryOptions} type="logistics_mode_list" value={value} />
+            );
         },
     },
     {
         title: "平台类型",
         dataIndex: "return_platform",
         align: "center",
+        width: "120px",
         render: (value: any) => {
-            return <OptionItem type="return_platform" value={value} />;
+            return (
+                <OptionItem syncCallback={queryOptions} type="return_platform_list" value={value} />
+            );
         },
     },
     {
         title: "状态",
         dataIndex: "status",
         align: "center",
+        width: "120px",
         render: (value: any) => {
-            return <OptionItem type="status" value={value} />;
+            return <OptionItem syncCallback={queryOptions} type="status_list" value={value} />;
         },
     },
     {
         title: "运单号",
         dataIndex: "track_number",
         align: "center",
+        width: "150px",
     },
     {
         title: "物流渠道",
         dataIndex: "physical_channel",
         align: "center",
+        width: "120px",
     },
     {
         title: "当前节点",
         dataIndex: "current_node",
         align: "center",
+        width: "150px",
     },
     {
         title: "费用",
         dataIndex: "cost",
         align: "center",
+        width: "120px",
     },
     {
         title: "退入仓库",
         dataIndex: "return_warehouse",
         align: "center",
+        width: "150px",
     },
     {
         title: "入库单号",
         dataIndex: "warehouse_receipt",
         align: "center",
+        width: "150px",
     },
     {
         title: "创建时间",
         dataIndex: "create_time",
         align: "center",
+        width: "150px",
     },
     {
         title: "操作",
         dataIndex: "option",
         align: "center",
+        width: "120px",
         render: (_, record: TableListItem) => <span>1</span>,
     },
 ];
 
+const PageSize = 50;
+
 const ReturnPage: React.FC = props => {
-    const [loading, setLoading] = useState(true);
-    const [pageNumber, setPageNumber] = useState(1);
-    const [pageSize, setPageSize] = useState(50);
-    const [dataSource, setDataSource] = useState<TableListItem[]>([]);
-    const [total, setTotal] = useState(0);
+    const [type, setType] = useState<number>(1);
     const searchRef = useRef<SearchForm>(null);
+    const {
+        loading,
+        pageNumber,
+        pageSize,
+        dataSource,
+        total,
+        onSearch,
+        onReload,
+        onChange,
+        setDataSource,
+        setPageSize,
+        setTotal,
+        setPageNumber,
+        getListData,
+    } = useList(searchRef, queryReturnList, {
+        tabType: type,
+    });
 
-    const getListData = ({
-        page = pageNumber,
-        page_count = pageSize,
-    }: { page?: number; page_count?: number } = {}) => {
-        const formValues = searchRef.current!.getFieldsValue();
-        setLoading(true);
-        const query = {
-            ...formValues,
-            page: page,
-            page_count: page_count,
-        };
-        return queryReturnList(query)
-            .then(({ data: { list = [], total = 0 } }) => {
-                setDataSource(list);
-                setTotal(total);
-                setPageNumber(page);
-                setPageSize(page_count);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
-    };
-
-    const exportTable = () => {
+    const exportTable = useCallback(() => {
         const query = searchRef.current!.getFieldsValue();
         return exportReturnList(query);
-    };
+    }, []);
 
-    const onSearch = () => {
-        return getListData({
-            page: 1,
-        });
-    };
-
-    const onChange = ({ current, pageSize }: PaginationConfig) => {
+    const onTabChange = useCallback((activeKey: string) => {
+        const tabType = Number(activeKey);
+        setType(tabType);
+        setDataSource([]);
+        setPageSize(PageSize);
+        setTotal(0);
+        setPageNumber(1);
         getListData({
-            page: current,
-            page_count: pageSize,
+            page: 1,
+            page_count: PageSize,
+            tabType: tabType,
         });
-    };
-
-    const reload = () => getListData();
-
-    // componentDidMount
-    useEffect(() => {
-        onSearch();
     }, []);
 
     return useMemo(() => {
-        console.log("render");
         return (
             <PageHeaderWrapper>
                 <Card
@@ -301,10 +268,25 @@ const ReturnPage: React.FC = props => {
                     options={{
                         density: true,
                         fullScreen: true,
-                        reload: reload,
+                        reload: onReload,
                         setting: true,
                     }}
-                />
+                >
+                    <Tabs
+                        activeKey={String(type)}
+                        type="card"
+                        onChange={onTabChange}
+                        children={[
+                            <Tabs.TabPane tab="全部" key="1"></Tabs.TabPane>,
+                            <Tabs.TabPane tab="创建面单" key="2"></Tabs.TabPane>,
+                            <Tabs.TabPane tab="已揽收" key="3"></Tabs.TabPane>,
+                            <Tabs.TabPane tab="抵达本地" key="4"></Tabs.TabPane>,
+                            <Tabs.TabPane tab="抵达目的国Hub" key="5"></Tabs.TabPane>,
+                            <Tabs.TabPane tab="退货仓库收" key="6"></Tabs.TabPane>,
+                            <Tabs.TabPane tab="仓库入库" key="7"></Tabs.TabPane>,
+                        ]}
+                    />
+                </ProTable>
             </PageHeaderWrapper>
         );
     }, [loading]);

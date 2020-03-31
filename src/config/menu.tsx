@@ -48,6 +48,7 @@ export default [
     {
         path: "after-sale",
         name: "售后管理",
+        icon: <Icons type="scm-task" />,
         children: [
             {
                 path: "/after-sale/return",
@@ -56,6 +57,33 @@ export default [
             {
                 path: "/after-sale/history",
                 name: "历史退货单",
+            },
+        ],
+    },
+    {
+        path: "supplier",
+        name: "供应商管理",
+        icon: <Icons type="scm-task" />,
+        children: [
+            {
+                path: "/supplier/logistics",
+                name: "物流商管理",
+            },
+            {
+                path: "/supplier/channels",
+                name: "渠道管理",
+            },
+            {
+                path: "/supplier/offers",
+                name: "渠道报价",
+            },
+            {
+                path: "/supplier/kpi",
+                name: "KPI渠道配置",
+            },
+            {
+                path: "/supplier/order",
+                name: "物流打单配置",
             },
         ],
     },
