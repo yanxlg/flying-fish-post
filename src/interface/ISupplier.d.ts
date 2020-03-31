@@ -123,3 +123,19 @@ declare interface IOfferDetail {
     registration_fee: string;
     kilogram_fee: string;
 }
+
+export interface IKpiRequest {
+    country?: string;
+}
+
+export interface IKpiItem {
+    country: string;
+    trans_type: string;
+    aging: string;
+    effective_time: string;
+}
+
+export interface IKpiOptionListResponse {
+    country_list: IOptionItem[];
+    trans_type_list: IOptionItem[];
+}

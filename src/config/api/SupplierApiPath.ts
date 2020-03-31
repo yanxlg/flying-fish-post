@@ -21,4 +21,9 @@ export enum SupplierApiPath {
     exportOffersList = "/v1/offers/export",
     uploadOfferFile = "/v1/offers/upload",
     queryOfferDetail = "/v1/offers/detail",
+
+    queryKpiList = "/v1/kpi/list",
+    uploadKpiFile = "/v1/kpi/upload",
+    downloadKpiTemplate = "/v1/kpi/template",
+    queryKpiOptionsList = "/v1/offers/options",
 }

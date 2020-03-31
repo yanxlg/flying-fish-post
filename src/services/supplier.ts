@@ -16,6 +16,9 @@ import {
     IOffer,
     IOffersOptionListResponse,
     IOfferDetail,
+    IKpiRequest,
+    IKpiItem,
+    IKpiOptionListResponse,
 } from "@/interface/ISupplier";
 import { IBoolean, IPaginationResponse, IRequestPagination, IResponse } from "@/interface/IGlobal";
 
@@ -180,4 +183,35 @@ export async function queryOfferDetail(id: string) {
             id,
         },
     });
+}
+
+export async function queryKpiList(query: IKpiRequest & IRequestPagination) {
+    return request.get<IResponse<IPaginationResponse<IKpiItem>>>(SupplierApiPath.queryKpiList, {
+        params: query,
+    });
+}
+
+export async function uploadKpi(file: File) {
+    const forms = new FormData();
+    forms.append("file", file);
+    return request.post(SupplierApiPath.uploadKpiFile, {
+        requestType: "form",
+        data: forms,
+    });
+}
+
+export async function downloadKpiTemplate() {
+    return request
+        .get(SupplierApiPath.downloadKpiTemplate, {
+            responseType: "blob",
+            parseResponse: false,
+        })
+        .then(downloadExcel)
+        .catch(() => {
+            message.error("下载失败，请稍后重试！");
+        });
+}
+
+export async function queryKpiOptionsList() {
+    return request.get<IResponse<IKpiOptionListResponse>>(SupplierApiPath.queryKpiOptionsList);
 }
