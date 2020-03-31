@@ -88,9 +88,11 @@ const OrderThree: React.FC = props => {
         }: { page?: number; page_count?: number } = {}) => {
             setLoading(true);
             console.log(111111, filterFormRef.current!.getFieldsValue());
+            const values = filterFormRef.current!.getFieldsValue();
             const params = {
                 page: page,
                 page_count: page_count,
+                ...values,
             };
             return getOrderList(params)
                 .then(({ data: { list = [], total = 0 } }) => {
