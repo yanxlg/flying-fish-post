@@ -128,7 +128,7 @@ function useFilterTable<T>(columns: IWrappedProColumns<T>[]): ProColumns<T>[] {
             } else {
                 return column;
             }
-        });
+        }) as ProColumns<T>[];
     }, [columns]);
 }
 
