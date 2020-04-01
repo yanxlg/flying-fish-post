@@ -1,5 +1,5 @@
-import { Form, Select } from "antd";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Form, Select, Radio } from "antd";
+import React, { useCallback, useState, useEffect, useMemo } from "react";
 import { CustomFormProps, FormItemName } from "@/components/SearchForm";
 import { FormInstance, Rule } from "antd/es/form";
 import { FormItemLabelProps } from "antd/es/form/FormItemLabel";
@@ -38,6 +38,7 @@ export type SelectProps<T = string> = FormItemLabelProps &
         rules?: Rule[];
         mode?: "multiple" | "tags";
         maxTagCount?: number;
+        isShortcut?: boolean;
     };
 
 const FormSelect = (props: SelectProps) => {
@@ -54,8 +55,9 @@ const FormSelect = (props: SelectProps) => {
         optionList,
         rules,
         mode,
-        maxTagCount,
+        maxTagCount = 4,
         placeholder,
+        isShortcut = false
     } = props;
     const [options, setOptions] = useState<IOptionItem[] | undefined>(undefined);
 
@@ -123,6 +125,44 @@ const FormSelect = (props: SelectProps) => {
             : {};
     }, []);
 
+    // 显示全选快捷键
+    const dropdownRender = useCallback((menu: React.ReactElement): React.ReactElement => {
+        const { loading, optionList: list } = getOptionList();
+        if (isShortcut) {
+            return (
+                <div>
+                    {/* value={size} onChange={this.handleSizeChange} */}
+                    <Radio.Group style={{ display: 'flex', padding: '5px 0' }} value=''>
+                        <Radio.Button
+                            value="1"
+                            style={{ flex: 1, textAlign: 'center' }}
+                            onClick={() => {
+                                form!.setFieldsValue({
+                                    [name]: list!.map(item => item.value),
+                                });
+                            }}
+                        >
+                            全选
+                        </Radio.Button>
+                        <Radio.Button
+                            value="0"
+                            style={{ flex: 1, textAlign: 'center' }}
+                            onClick={() => {
+                                form!.setFieldsValue({
+                                    [name]: [],
+                                });
+                            }}
+                        >
+                            取消全选
+                        </Radio.Button>
+                    </Radio.Group>
+                    {menu}
+                </div>
+            )
+        }
+        return menu
+    }, [isShortcut, getOptionList])
+
     return useMemo(() => {
         if (optionListDependence === void 0) {
             const { loading, optionList: list } = getOptionList();
@@ -140,6 +180,7 @@ const FormSelect = (props: SelectProps) => {
                         maxTagCount={maxTagCount}
                         {...eventProps}
                         placeholder={placeholder}
+                        dropdownRender={dropdownRender}
                     >
                         {syncDefaultOption ? (
                             <Select.Option value={syncDefaultOption.value}>
@@ -181,7 +222,14 @@ const FormSelect = (props: SelectProps) => {
                                 label={<span className={labelClassName}>{label}</span>}
                                 rules={rules}
                             >
-                                <Select className={className} loading={loading} {...eventProps}>
+                                <Select 
+                                    className={className} 
+                                    loading={loading} 
+                                    mode={mode}
+                                    maxTagCount={maxTagCount}
+                                    {...eventProps} 
+                                    dropdownRender={dropdownRender}
+                                >
                                     {syncDefaultOption ? (
                                         <Select.Option value={syncDefaultOption.value}>
                                             {syncDefaultOption.name}

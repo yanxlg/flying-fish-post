@@ -1,13 +1,14 @@
 import React, { useMemo, useCallback, useRef, useState } from "react";
 import { Modal } from "antd";
-import SearchForm, { IFieldItem } from "@/components/SearchForm";
+// import SearchForm, { IFieldItem } from "@/components/SearchForm";
+import SearchForm, { FormField, SearchFormRef } from "@/components/SearchForm";
 import { IEditFormItems } from "@/interface/IPlatform";
 import { platformStatusList } from "@/enums/StatusEnum";
 import { editPlatform } from "@/services/platform";
 
 import styles from "./index.less";
 
-const fieldsList: IFieldItem<keyof IEditFormItems>[] = [
+const fieldsList: FormField<keyof IEditFormItems>[] = [
     {
         label: "上级平台",
         type: "select",
@@ -47,13 +48,13 @@ const fieldsList: IFieldItem<keyof IEditFormItems>[] = [
             }),
         ],
     },
-    {
-        label: "平台描述",
-        type: "textarea",
-        name: "description",
-        className: "",
-        placeholder: "请输入平台描述",
-    },
+    // {
+    //     label: "平台描述",
+    //     type: "textarea",
+    //     name: "description",
+    //     className: "",
+    //     placeholder: "请输入平台描述",
+    // },
 ];
 
 const initialValues = {
@@ -68,7 +69,7 @@ declare interface IProps {
 
 const EditModal: React.FC<IProps> = props => {
     const [loading, setLoading] = useState<boolean>(false);
-    const searchRef = useRef<SearchForm>(null);
+    const searchRef = useRef<SearchFormRef>(null);
 
     const handleOk = useCallback(() => {
         const formValues = searchRef.current!.getFieldsValue();

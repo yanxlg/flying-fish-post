@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useEffect, useCallback, useRef } from "react";
-import FilterForm from "./FilterForm";
+import { Button } from "antd";
+import FilterForm, { FilterFormRef } from "./FilterForm";
 import BtnGroup from "./BtnGroup";
 import ProTable, { ProColumns } from "@/components/OptimizeProTable";
 
@@ -12,73 +13,103 @@ const columns: ProColumns<ITableListItem>[] = [
         title: "单号",
         dataIndex: "logistics_no",
         align: "center",
+        width: 120,
     },
     {
         title: "运单号",
         dataIndex: "waybill_no",
         align: "center",
-    },
-    {
-        title: "类型",
-        dataIndex: "type",
-        align: "center",
-    },
-    {
-        title: "仓库",
-        dataIndex: "warehouse",
-        align: "center",
+        width: 120,
     },
     {
         title: "状态",
-        dataIndex: "status",
+        dataIndex: "type",
         align: "center",
+        width: 120,
     },
     {
         title: "平台",
+        dataIndex: "warehouse",
+        align: "center",
+        width: 120,
+    },
+    {
+        title: "异常原因",
+        dataIndex: "status",
+        align: "center",
+        width: 120,
+    },
+    {
+        title: "处理类型",
         dataIndex: "platform",
         align: "center",
+        width: 120,
+    },
+    {
+        title: "处理备注",
+        dataIndex: "logistics_channel",
+        align: "center",
+        width: 120,
     },
     {
         title: "物流渠道",
-        dataIndex: "logistics_channel",
+        dataIndex: "associated_waybill",
         align: "center",
+        width: 120,
     },
     {
         title: "关联运单",
-        dataIndex: "associated_waybill",
-        align: "center",
-    },
-    {
-        title: "当前节点",
         dataIndex: "current_node",
         align: "center",
+        width: 120,
     },
     {
         title: "费用",
         dataIndex: "fee",
         align: "center",
+        width: 120,
+    },
+    {
+        title: "当前节点",
+        dataIndex: "create_time",
+        align: "center",
+        width: 120,
     },
     {
         title: "创建时间",
-        dataIndex: "create_time",
+        dataIndex: "a1",
         align: "center",
+        width: 120,
+    },
+    {
+        title: "处理人",
+        dataIndex: "a2",
+        align: "center",
+        width: 120,
+    },
+    {
+        title: "处理时间",
+        dataIndex: "a4",
+        align: "center",
+        width: 120,
     },
     {
         title: "操作",
         dataIndex: "option",
         align: "center",
+        width: 120,
         render: (_, record: ITableListItem) => <a>详情</a>,
     },
 ];
 
-const OrderThree: React.FC = props => {
+const Order3PL: React.FC = props => {
     const [loading, setLoading] = useState<boolean>(true);
     const [pageNumber, setPageNumber] = useState<number>(1);
     const [pageSize, setPageSize] = useState<number>(50);
     const [total, setTotal] = useState<number>(0);
     const [orderList, setOrderList] = useState<ITableListItem[]>([]);
     // typeof FilterForm
-    const filterFormRef = useRef<any>(null);
+    const filterFormRef = useRef<FilterFormRef>(null);
 
     const getPageData = useCallback(
         ({
@@ -86,8 +117,8 @@ const OrderThree: React.FC = props => {
             page_count = pageSize,
         }: { page?: number; page_count?: number } = {}) => {
             setLoading(true);
-            console.log(111111, filterFormRef.current!.getFieldsValue());
-            const values = filterFormRef.current!.getFieldsValue();
+            // console.log(111111, filterFormRef.current.getFieldsValue());
+            const values = filterFormRef.current?.getFieldsValue();
             const params = {
                 page: page,
                 page_count: page_count,
@@ -129,7 +160,7 @@ const OrderThree: React.FC = props => {
     return useMemo(() => {
         return (
             <>
-                <FilterForm ref={filterFormRef} getPageData={getPageData} />
+                <FilterForm ref={filterFormRef} getPageData={getPageData}/>
                 <div style={{ marginTop: 40 }}>
                     <BtnGroup />
                     <ProTable<ITableListItem>
@@ -153,6 +184,15 @@ const OrderThree: React.FC = props => {
                             reload: reload,
                             setting: true,
                         }}
+                        scroll={{ x: "max-content" }}
+                        rowSelection={{
+                            columnWidth: 60,
+                        }}
+                        toolBarRender={() => [
+                            <Button key="1" type="primary">
+                                批量导出
+                            </Button>,
+                        ]}
                     />
                 </div>
             </>
@@ -160,4 +200,4 @@ const OrderThree: React.FC = props => {
     }, [loading, orderList]);
 };
 
-export default OrderThree;
+export default Order3PL;

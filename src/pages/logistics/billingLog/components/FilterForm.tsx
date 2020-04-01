@@ -3,20 +3,19 @@ import React, {
     forwardRef,
     useImperativeHandle,
     useRef,
-    RefForwardingComponent,
+    ForwardRefRenderFunction,
 } from "react";
 import SearchForm, { FormField, SearchFormRef } from "@/components/SearchForm";
 
 import LoadingButton from "@/components/LoadingButton";
 import { queryOptionList } from "@/services/logistics/delivery";
-import { IFormItems } from "@/interface/logistics/IDelivery";
 
-import styles from "../delivery.less";
+import styles from "../index.less";
 import formStyles from "@/components/SearchForm/_form.less";
 
 const queryOptions = queryOptionList();
 
-const fieldsList: FormField<keyof IFormItems>[] = [
+const fieldsList: FormField[] = [
     {
         label: <span>单&emsp;&emsp;号</span>,
         type: "input",
@@ -27,29 +26,11 @@ const fieldsList: FormField<keyof IFormItems>[] = [
         placeholder: "物流单号/运单号/平台单号/关联运单",
     },
     {
-        label: <span>平&emsp;&emsp;台</span>,
+        label: <span>打单结果</span>,
         type: "select",
-        isShortcut: true,
-        mode: 'multiple',
-        name: "platform_id",
+        name: "a4",
         className: styles.defaultInput,
         formItemClassName: formStyles.formItem,
-        placeholder: "选择平台",
-        optionList: () => {
-            return queryOptions.then(({ data: { platform_list = [] } }) => {
-                return platform_list;
-            });
-        },
-    },
-    {
-        label: <span>仓&emsp;&emsp;库</span>,
-        type: "select",
-        isShortcut: true,
-        mode: 'multiple',
-        name: "warehouse_code",
-        className: styles.defaultInput,
-        formItemClassName: formStyles.formItem,
-        placeholder: "选择仓库",
         optionList: () => {
             return queryOptions.then(({ data: { warehouse_list = [] } }) => {
                 return warehouse_list;
@@ -57,22 +38,38 @@ const fieldsList: FormField<keyof IFormItems>[] = [
         },
     },
     {
-        label: "物流渠道",
+        label: <span>物流渠道</span>,
         type: "select",
         isShortcut: true,
         mode: 'multiple',
-        name: "shipping_way",
+        name: "a3",
         className: styles.defaultInput,
         formItemClassName: formStyles.formItem,
         placeholder: "选择物流渠道",
         optionList: () => {
-            return queryOptions.then(({ data: { shipping_way_list = [] } }) => {
-                return shipping_way_list;
+            return queryOptions.then(({ data: { warehouse_list = [] } }) => {
+                return warehouse_list;
             });
         },
     },
     {
-        label: "创建时间",
+        label: <span>平台类型</span>,
+        type: "select",
+        isShortcut: true,
+        mode: 'multiple',
+        name: "a2",
+        className: styles.defaultInput,
+        formItemClassName: formStyles.formItem,
+        placeholder: "选择平台类型",
+        optionList: () => {
+            return queryOptions.then(({ data: { warehouse_list = [] } }) => {
+                return warehouse_list;
+            });
+        },
+    },
+
+    {
+        label: <span>创建时间</span>,
         type: "dateRanger",
         formItemClassName: formStyles.formItem,
         name: ["reservation_start", "reservation_end"],
@@ -80,11 +77,15 @@ const fieldsList: FormField<keyof IFormItems>[] = [
     },
 ];
 
+export interface FilterFormRef {
+    getFieldsValue: any;
+}
+
 declare interface IProps {
     getPageData(): Promise<void>;
 }
 
-const FilterForm: RefForwardingComponent<any, IProps> = (props: IProps, ref) => {
+const FilterForm: ForwardRefRenderFunction<FilterFormRef, IProps> = (props: IProps, ref) => {
     // console.log('1111',props);
     const searchRef = useRef<SearchFormRef>(null);
     // getFieldsValue: ()

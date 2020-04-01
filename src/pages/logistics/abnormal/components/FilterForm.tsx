@@ -3,20 +3,20 @@ import React, {
     forwardRef,
     useImperativeHandle,
     useRef,
-    RefForwardingComponent,
+    ForwardRefRenderFunction,
 } from "react";
 import SearchForm, { FormField, SearchFormRef } from "@/components/SearchForm";
 
 import LoadingButton from "@/components/LoadingButton";
 import { queryOptionList } from "@/services/logistics/delivery";
-import { IFormItems } from "@/interface/logistics/IDelivery";
 
-import styles from "../delivery.less";
+import styles from "../index.less";
 import formStyles from "@/components/SearchForm/_form.less";
 
 const queryOptions = queryOptionList();
 
-const fieldsList: FormField<keyof IFormItems>[] = [
+// <keyof IFormItems>
+const fieldsList: FormField[] = [
     {
         label: <span>单&emsp;&emsp;号</span>,
         type: "input",
@@ -42,7 +42,7 @@ const fieldsList: FormField<keyof IFormItems>[] = [
         },
     },
     {
-        label: <span>仓&emsp;&emsp;库</span>,
+        label: <span>处理状态</span>,
         type: "select",
         isShortcut: true,
         mode: 'multiple',
@@ -57,34 +57,30 @@ const fieldsList: FormField<keyof IFormItems>[] = [
         },
     },
     {
-        label: "物流渠道",
-        type: "select",
-        isShortcut: true,
-        mode: 'multiple',
-        name: "shipping_way",
-        className: styles.defaultInput,
-        formItemClassName: formStyles.formItem,
-        placeholder: "选择物流渠道",
-        optionList: () => {
-            return queryOptions.then(({ data: { shipping_way_list = [] } }) => {
-                return shipping_way_list;
-            });
-        },
-    },
-    {
         label: "创建时间",
         type: "dateRanger",
         formItemClassName: formStyles.formItem,
         name: ["reservation_start", "reservation_end"],
         formatter: ["start_date", "end_date"],
     },
+    {
+        label: "异常时间",
+        type: "dateRanger",
+        formItemClassName: formStyles.formItem,
+        name: ["delivered_start", "delivered_end"],
+        formatter: ["start_date", "end_date"],
+    },
 ];
+
+export interface FilterFormRef {
+    getFieldsValue: any;
+}
 
 declare interface IProps {
     getPageData(): Promise<void>;
 }
 
-const FilterForm: RefForwardingComponent<any, IProps> = (props: IProps, ref) => {
+const FilterForm: ForwardRefRenderFunction<FilterFormRef, IProps> = (props: IProps, ref) => {
     // console.log('1111',props);
     const searchRef = useRef<SearchFormRef>(null);
     // getFieldsValue: ()
