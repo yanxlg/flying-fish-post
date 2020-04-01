@@ -1,11 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { PageHeaderWrapper } from "@ant-design/pro-layout";
 import { Button, Card } from "antd";
-import SearchForm, { IFieldItem } from "@/components/SearchForm";
-import formStyles from "@/styles/_form.less";
-import btnStyles from "@/styles/_btn.less";
+import SearchForm, { FormField, SearchFormRef } from "@/components/SearchForm";
+import formStyles from "@/components/SearchForm/_form.less";
 import LoadingButton from "@/components/LoadingButton";
-import ProTable from "@/components/ProTable";
 import {
     queryOffersList,
     queryOffersOptionsList,
@@ -20,6 +18,7 @@ import OptionItem from "../../components/OptionItem";
 import { IWrappedProColumns, useFilterTable, useList, useModal } from "@/utils/hooks";
 import UploadLoadingBtn from "@/components/UploadLoadingBtn";
 import OfferModal from "./components/OfferModal";
+import ProTable from "@/components/OptimizeProTable";
 
 export const queryOptions = (() => {
     let syncPromise: Promise<IResponse<IOffersOptionListResponse>>;
@@ -33,12 +32,13 @@ export const queryOptions = (() => {
     };
 })();
 
-const formConfig: IFieldItem<keyof IOffersRequestForm>[] = [
+const formConfig: FormField<keyof IOffersRequestForm>[] = [
     {
         label: "物流商",
         type: "select",
         name: "logistic",
         formatter: "number",
+        formItemClassName: formStyles.formItem,
         syncDefaultOption: {
             name: "全部",
             value: "",
@@ -53,6 +53,7 @@ const formConfig: IFieldItem<keyof IOffersRequestForm>[] = [
         label: "快递渠道",
         type: "select",
         name: "channel",
+        formItemClassName: formStyles.formItem,
         formatter: "number",
         syncDefaultOption: {
             name: "全部",
@@ -68,6 +69,7 @@ const formConfig: IFieldItem<keyof IOffersRequestForm>[] = [
         label: <span>国&emsp;&emsp;家</span>,
         type: "select",
         name: "country",
+        formItemClassName: formStyles.formItem,
         formatter: "number",
         syncDefaultOption: {
             name: "全部",
@@ -83,6 +85,7 @@ const formConfig: IFieldItem<keyof IOffersRequestForm>[] = [
         label: "报价模式",
         type: "select",
         name: "offer_mode",
+        formItemClassName: formStyles.formItem,
         formatter: "number",
         syncDefaultOption: {
             name: "全部",
@@ -98,6 +101,7 @@ const formConfig: IFieldItem<keyof IOffersRequestForm>[] = [
         label: "发件区域",
         type: "select",
         name: "hair_area",
+        formItemClassName: formStyles.formItem,
         formatter: "number",
         syncDefaultOption: {
             name: "全部",
@@ -112,7 +116,7 @@ const formConfig: IFieldItem<keyof IOffersRequestForm>[] = [
 ];
 
 const ChannelsPage: React.FC = () => {
-    const searchRef = useRef<SearchForm>(null);
+    const searchRef = useRef<SearchFormRef>(null);
     const {
         loading,
         pageNumber,
@@ -122,7 +126,7 @@ const ChannelsPage: React.FC = () => {
         onSearch,
         onReload,
         onChange,
-    } = useList(searchRef, queryOffersList);
+    } = useList({ formRef: searchRef, queryList: queryOffersList });
 
     const { visible, onClose, setVisibleProps } = useModal();
 
@@ -145,7 +149,7 @@ const ChannelsPage: React.FC = () => {
                 width: "150px",
                 filterType: "input",
                 sorter: true,
-                render: (value: any, record, index, action, filterText) => {
+                render: (value: any, record, index, filterText) => {
                     return (
                         <OptionItem
                             syncCallback={queryOptions}
@@ -166,7 +170,7 @@ const ChannelsPage: React.FC = () => {
                 width: "150px",
                 filterType: "input",
                 sorter: true,
-                render: (value: any, record, index, action, filterText) => {
+                render: (value: any, record, index, filterText) => {
                     return (
                         <OptionItem
                             syncCallback={queryOptions}
@@ -187,7 +191,7 @@ const ChannelsPage: React.FC = () => {
                 width: "150px",
                 filterType: "input",
                 sorter: true,
-                render: (value: any, record, index, action, filterText) => {
+                render: (value: any, record, index, filterText) => {
                     return (
                         <OptionItem
                             syncCallback={queryOptions}
@@ -216,7 +220,7 @@ const ChannelsPage: React.FC = () => {
                 width: "150px",
                 filterType: "input",
                 sorter: true,
-                render: (value: any, record, index, action, filterText) => {
+                render: (value: any, record, index, filterText) => {
                     return (
                         <OptionItem
                             syncCallback={queryOptions}
@@ -237,7 +241,7 @@ const ChannelsPage: React.FC = () => {
                 width: "150px",
                 filterType: "input",
                 sorter: true,
-                render: (value: any, record, index, action, filterText) => {
+                render: (value: any, record, index, filterText) => {
                     return (
                         <OptionItem
                             syncCallback={queryOptions}
@@ -300,6 +304,7 @@ const ChannelsPage: React.FC = () => {
                         >
                             <SearchForm
                                 fieldList={formConfig}
+                                enableCollapse={false}
                                 ref={searchRef}
                                 initialValues={{
                                     logistic: "",
@@ -310,7 +315,7 @@ const ChannelsPage: React.FC = () => {
                                 }}
                             >
                                 <LoadingButton
-                                    className={btnStyles.btnGroup}
+                                    className={formStyles.formItem}
                                     type="primary"
                                     onClick={onSearch}
                                 >
@@ -319,7 +324,7 @@ const ChannelsPage: React.FC = () => {
                             </SearchForm>
                         </Card>
                         <ProTable<IOffer>
-                            search={false}
+                            className={formStyles.formItem}
                             headerTitle="查询表格"
                             rowKey="id"
                             pagination={{
@@ -329,7 +334,7 @@ const ChannelsPage: React.FC = () => {
                                 showSizeChanger: true,
                                 pageSizeOptions: ["50", "100", "200"],
                             }}
-                            toolBarRender={(action, { selectedRows }) => [
+                            toolBarRender={() => [
                                 <UploadLoadingBtn
                                     beforeUpload={uploadOffer}
                                     multiple={false}
@@ -343,12 +348,6 @@ const ChannelsPage: React.FC = () => {
                                     批量导出
                                 </LoadingButton>,
                             ]}
-                            tableAlertRender={(selectedRowKeys, selectedRows) => (
-                                <div>
-                                    已选择{" "}
-                                    <a style={{ fontWeight: 600 }}>{selectedRowKeys.length}</a> 项
-                                </div>
-                            )}
                             columns={columns}
                             dataSource={dataSource}
                             loading={loading}

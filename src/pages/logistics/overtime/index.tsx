@@ -3,16 +3,15 @@ import { Card } from "antd";
 import { PageHeaderWrapper } from "@ant-design/pro-layout";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import FilterForm, { FilterFormRef } from "./components/FilterForm";
-import { ProColumns } from "@ant-design/pro-table";
 import classnames from "classnames";
-import ProTable from "@/components/ProTable";
+import ProTable, { ProColumns } from "@/components/OptimizeProTable";
 
 import { getOrderList } from "@/services/logistics/delivery";
 import { PaginationConfig } from "antd/lib/pagination";
 import { ITableListItem } from "@/interface/logistics/IDelivery";
 
 import indexStyles from "@/styles/_index.less";
-import formStyles from "@/styles/_form.less";
+import formStyles from "@/components/SearchForm/_form.less";
 
 const columns: ProColumns<ITableListItem>[] = [
     {
@@ -185,7 +184,8 @@ const LogisticsOvertime: React.FC = props => {
                     <FilterForm ref={filterFormRef} getPageData={getPageData} />
                 </Card>
                 <ProTable<ITableListItem>
-                    search={false}
+                    // search={false}
+                    className={formStyles.formItem}
                     headerTitle="订单列表"
                     rowKey="logistics_no"
                     pagination={{

@@ -5,31 +5,35 @@ import React, {
     useRef,
     ForwardRefRenderFunction,
 } from "react";
-import SearchForm, { IFieldItem } from "@/components/SearchForm";
+import SearchForm, { FormField, SearchFormRef } from "@/components/SearchForm";
 
 import LoadingButton from "@/components/LoadingButton";
 import { queryOptionList } from "@/services/logistics/delivery";
-import { IFormItems } from "@/interface/logistics/IDelivery";
 
 import styles from "../index.less";
+import formStyles from "@/components/SearchForm/_form.less";
 
 const queryOptions = queryOptionList();
 
 // <keyof IFormItems>
-const fieldsList: IFieldItem[] = [
+const fieldsList: FormField[] = [
     {
         label: <span>单&emsp;&emsp;号</span>,
         type: "input",
         name: "shipping_order_sn",
         className: styles.defaultInput,
+        formItemClassName: formStyles.formItem,
         formatter: "number",
         placeholder: "物流单号/运单号/平台单号/关联运单",
     },
     {
         label: <span>平&emsp;&emsp;台</span>,
-        type: "shortcutSelect",
+        type: "select",
+        isShortcut: true,
+        mode: 'multiple',
         name: "platform_id",
         className: styles.defaultInput,
+        formItemClassName: formStyles.formItem,
         placeholder: "选择平台",
         optionList: () => {
             return queryOptions.then(({ data: { platform_list = [] } }) => {
@@ -39,9 +43,12 @@ const fieldsList: IFieldItem[] = [
     },
     {
         label: <span>处理状态</span>,
-        type: "shortcutSelect",
+        type: "select",
+        isShortcut: true,
+        mode: 'multiple',
         name: "warehouse_code",
         className: styles.defaultInput,
+        formItemClassName: formStyles.formItem,
         placeholder: "选择仓库",
         optionList: () => {
             return queryOptions.then(({ data: { warehouse_list = [] } }) => {
@@ -52,12 +59,14 @@ const fieldsList: IFieldItem[] = [
     {
         label: "创建时间",
         type: "dateRanger",
+        formItemClassName: formStyles.formItem,
         name: ["reservation_start", "reservation_end"],
         formatter: ["start_date", "end_date"],
     },
     {
         label: "异常时间",
         type: "dateRanger",
+        formItemClassName: formStyles.formItem,
         name: ["delivered_start", "delivered_end"],
         formatter: ["start_date", "end_date"],
     },
@@ -73,7 +82,7 @@ declare interface IProps {
 
 const FilterForm: ForwardRefRenderFunction<FilterFormRef, IProps> = (props: IProps, ref) => {
     // console.log('1111',props);
-    const searchRef = useRef<SearchForm>(null);
+    const searchRef = useRef<SearchFormRef>(null);
     // getFieldsValue: ()
     useImperativeHandle(ref, () => ({
         getFieldsValue: () => {
@@ -86,7 +95,7 @@ const FilterForm: ForwardRefRenderFunction<FilterFormRef, IProps> = (props: IPro
             <SearchForm ref={searchRef} fieldList={fieldsList}>
                 <LoadingButton
                     type="primary"
-                    // className={btnStyles.btnGroup}
+                    className={formStyles.formItem}
                     onClick={() => props.getPageData()}
                 >
                     搜索

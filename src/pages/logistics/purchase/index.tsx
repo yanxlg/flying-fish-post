@@ -2,15 +2,15 @@ import React, { useMemo, useState, useEffect, useCallback, useRef } from "react"
 import { Button, Card } from "antd";
 import { PageHeaderWrapper } from "@ant-design/pro-layout";
 import FilterForm, { FilterFormRef } from "./components/FilterForm";
-import ProTable from "@/components/ProTable";
-import { ProColumns } from "@ant-design/pro-table";
+import ProTable, { ProColumns } from "@/components/OptimizeProTable";
 import BtnGroup from "./components/BtnGroup";
+import classnames from 'classnames';
 
 import { getOrderList } from "@/services/logistics/delivery";
 import { ITableListItem } from "@/interface/logistics/IDelivery";
 import { PaginationConfig } from "antd/lib/pagination";
 
-import formStyles from "@/styles/_form.less";
+import formStyles from "@/components/SearchForm/_form.less";
 
 const columns: ProColumns<ITableListItem>[] = [
     {
@@ -154,13 +154,14 @@ const LogisticsPurchase: React.FC = props => {
             <PageHeaderWrapper>
                 <Card
                     bordered={false}
-                    className={[formStyles.formItem, formStyles.formCard].join(" ")}
+                    className={classnames([formStyles.formItem, formStyles.formCard])}
+                    style={{ marginBottom: 24 }}
                 >
                     <FilterForm ref={filterFormRef} getPageData={getPageData} />
                 </Card>
-                <BtnGroup />
+                <BtnGroup/>
                 <ProTable<ITableListItem>
-                    search={false}
+                    // search={false}
                     headerTitle="订单列表"
                     rowKey="waybill_no"
                     pagination={{

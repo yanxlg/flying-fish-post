@@ -5,31 +5,35 @@ import React, {
     useRef,
     ForwardRefRenderFunction,
 } from "react";
-import SearchForm, { IFieldItem } from "@/components/SearchForm";
+import SearchForm, { FormField, SearchFormRef } from "@/components/SearchForm";
 
 import LoadingButton from "@/components/LoadingButton";
 import { queryOptionList } from "@/services/logistics/delivery";
-import { IFormItems } from "@/interface/logistics/IDelivery";
 
 import styles from "../index.less";
+import formStyles from "@/components/SearchForm/_form.less";
 
 const queryOptions = queryOptionList();
 
 // <keyof IFormItems>
-const fieldsList: IFieldItem[] = [
+const fieldsList: FormField[] = [
     {
         label: <span>&emsp;单&emsp;&emsp;号&emsp;</span>,
         type: "input",
         name: "shipping_order_sn",
         className: styles.defaultInput,
+        formItemClassName: formStyles.formItem,
         formatter: "number",
         placeholder: "物流单号/运单号/平台单号/关联运单",
     },
     {
         label: <span>&emsp;仓&emsp;&emsp;库&emsp;</span>,
-        type: "shortcutSelect",
+        type: "select",
+        isShortcut: true,
+        mode: 'multiple',
         name: "a2",
         className: styles.defaultInput,
+        formItemClassName: formStyles.formItem,
         placeholder: "选择物流渠道",
         optionList: () => {
             return queryOptions.then(({ data: { warehouse_list = [] } }) => {
@@ -39,9 +43,12 @@ const fieldsList: IFieldItem[] = [
     },
     {
         label: <span>&emsp;物流渠道&emsp;</span>,
-        type: "shortcutSelect",
+        type: "select",
+        isShortcut: true,
+        mode: 'multiple',
         name: "a3",
         className: styles.defaultInput,
+        formItemClassName: formStyles.formItem,
         placeholder: "选择物流渠道",
         optionList: () => {
             return queryOptions.then(({ data: { warehouse_list = [] } }) => {
@@ -54,6 +61,7 @@ const fieldsList: IFieldItem[] = [
         type: "select",
         name: "a4",
         className: styles.defaultInput,
+        formItemClassName: formStyles.formItem,
         optionList: () => {
             return queryOptions.then(({ data: { warehouse_list = [] } }) => {
                 return warehouse_list;
@@ -63,12 +71,14 @@ const fieldsList: IFieldItem[] = [
     {
         label: <span>&emsp;创建时间&emsp;</span>,
         type: "dateRanger",
+        formItemClassName: formStyles.formItem,
         name: ["reservation_start", "reservation_end"],
         formatter: ["start_date", "end_date"],
     },
     {
         label: <span>&emsp;入库时间&emsp;</span>,
         type: "dateRanger",
+        formItemClassName: formStyles.formItem,
         name: ["delivered_start", "delivered_end"],
         formatter: ["start_date", "end_date"],
     },
@@ -84,7 +94,7 @@ declare interface IProps {
 
 const FilterForm: ForwardRefRenderFunction<FilterFormRef, IProps> = (props: IProps, ref) => {
     // console.log('1111',props);
-    const searchRef = useRef<SearchForm>(null);
+    const searchRef = useRef<SearchFormRef>(null);
     // getFieldsValue: ()
     useImperativeHandle(ref, () => ({
         getFieldsValue: () => {
@@ -97,7 +107,7 @@ const FilterForm: ForwardRefRenderFunction<FilterFormRef, IProps> = (props: IPro
             <SearchForm ref={searchRef} fieldList={fieldsList}>
                 <LoadingButton
                     type="primary"
-                    // className={btnStyles.btnGroup}
+                    className={formStyles.formItem}
                     onClick={() => props.getPageData()}
                 >
                     搜索

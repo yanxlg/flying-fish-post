@@ -2,8 +2,7 @@ import React, { useMemo, useState, useEffect, useCallback, useRef } from "react"
 import { Button } from "antd";
 import FilterForm, { FilterFormRef } from "./FilterForm";
 import BtnGroup from "./BtnGroup";
-import ProTable from "@/components/ProTable";
-import { ProColumns } from "@ant-design/pro-table";
+import ProTable, { ProColumns } from "@/components/OptimizeProTable";
 
 import { getOrderList } from "@/services/logistics/delivery";
 import { ITableListItem } from "@/interface/logistics/IDelivery";
@@ -161,39 +160,41 @@ const Order3PL: React.FC = props => {
     return useMemo(() => {
         return (
             <>
-                <FilterForm ref={filterFormRef} getPageData={getPageData} />
-                <BtnGroup />
-                <ProTable<ITableListItem>
-                    search={false}
-                    headerTitle="订单列表"
-                    rowKey="waybill_no"
-                    pagination={{
-                        total: total,
-                        current: pageNumber,
-                        pageSize: pageSize,
-                        showSizeChanger: true,
-                        pageSizeOptions: ["50", "100", "200"],
-                    }}
-                    columns={columns}
-                    dataSource={orderList}
-                    loading={loading}
-                    onChange={onChange}
-                    options={{
-                        density: true,
-                        fullScreen: true,
-                        reload: reload,
-                        setting: true,
-                    }}
-                    scroll={{ x: "max-content" }}
-                    rowSelection={{
-                        columnWidth: 60,
-                    }}
-                    toolBarRender={() => [
-                        <Button key="1" type="primary">
-                            批量导出
-                        </Button>,
-                    ]}
-                />
+                <FilterForm ref={filterFormRef} getPageData={getPageData}/>
+                <div style={{ marginTop: 40 }}>
+                    <BtnGroup />
+                    <ProTable<ITableListItem>
+                        // search={false}
+                        headerTitle="订单列表"
+                        rowKey="waybill_no"
+                        pagination={{
+                            total: total,
+                            current: pageNumber,
+                            pageSize: pageSize,
+                            showSizeChanger: true,
+                            pageSizeOptions: ["50", "100", "200"],
+                        }}
+                        columns={columns}
+                        dataSource={orderList}
+                        loading={loading}
+                        onChange={onChange}
+                        options={{
+                            density: true,
+                            fullScreen: true,
+                            reload: reload,
+                            setting: true,
+                        }}
+                        scroll={{ x: "max-content" }}
+                        rowSelection={{
+                            columnWidth: 60,
+                        }}
+                        toolBarRender={() => [
+                            <Button key="1" type="primary">
+                                批量导出
+                            </Button>,
+                        ]}
+                    />
+                </div>
             </>
         );
     }, [loading, orderList]);

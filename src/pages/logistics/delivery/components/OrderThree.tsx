@@ -1,8 +1,7 @@
 import React, { useMemo, useState, useEffect, useCallback, useRef } from "react";
 import FilterForm from "./FilterForm";
 import BtnGroup from "./BtnGroup";
-import ProTable from "@/components/ProTable";
-import { ProColumns } from "@ant-design/pro-table";
+import ProTable, { ProColumns } from "@/components/OptimizeProTable";
 
 import { getOrderList } from "@/services/logistics/delivery";
 import { ITableListItem } from "@/interface/logistics/IDelivery";
@@ -131,29 +130,31 @@ const OrderThree: React.FC = props => {
         return (
             <>
                 <FilterForm ref={filterFormRef} getPageData={getPageData} />
-                <BtnGroup />
-                <ProTable<ITableListItem>
-                    search={false}
-                    headerTitle="订单列表"
-                    rowKey="waybill_no"
-                    pagination={{
-                        total: total,
-                        current: pageNumber,
-                        pageSize: pageSize,
-                        showSizeChanger: true,
-                        pageSizeOptions: ["50", "100", "200"],
-                    }}
-                    columns={columns}
-                    dataSource={orderList}
-                    loading={loading}
-                    onChange={onChange}
-                    options={{
-                        density: true,
-                        fullScreen: true,
-                        reload: reload,
-                        setting: true,
-                    }}
-                />
+                <div style={{ marginTop: 40 }}>
+                    <BtnGroup />
+                    <ProTable<ITableListItem>
+                        // search={false}
+                        headerTitle="订单列表"
+                        rowKey="waybill_no"
+                        pagination={{
+                            total: total,
+                            current: pageNumber,
+                            pageSize: pageSize,
+                            showSizeChanger: true,
+                            pageSizeOptions: ["50", "100", "200"],
+                        }}
+                        columns={columns}
+                        dataSource={orderList}
+                        loading={loading}
+                        onChange={onChange}
+                        options={{
+                            density: true,
+                            fullScreen: true,
+                            reload: reload,
+                            setting: true,
+                        }}
+                    />
+                </div>
             </>
         );
     }, [loading, orderList]);

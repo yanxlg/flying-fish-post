@@ -2,30 +2,29 @@ import React, { useState, useEffect, useMemo, useRef, useCallback } from "react"
 import { Divider, Button, Card } from "antd";
 import { PageHeaderWrapper } from "@ant-design/pro-layout";
 import { PlusOutlined, DownOutlined } from "@ant-design/icons";
-import SearchForm, { IFieldItem } from "@/components/SearchForm";
+import SearchForm, { FormField, SearchFormRef } from "@/components/SearchForm";
 import LoadingButton from "@/components/LoadingButton";
 import { PaginationConfig } from "antd/es/pagination";
 import EditModal from "./components/EditModal/index";
-// ProTable,
-import ProTable from "@/components/ProTable";
-import { ProColumns } from "@ant-design/pro-table";
+import ProTable, { ProColumns } from "@/components/OptimizeProTable";
+import classnames from 'classnames';
 
 import { platformList, platformStatusList } from "@/enums/StatusEnum";
 import { getPlatformList, queryOptionList } from "@/services/platform";
 import { IFormItems, ITableListItem } from "@/interface/IPlatform";
 
-import formStyles from "@/styles/_form.less";
+import formStyles from "@/components/SearchForm/_form.less";
 import btnStyles from "@/styles/_btn.less";
 
 const queryOptions = queryOptionList();
 
-const fieldsList: IFieldItem<keyof IFormItems>[] = [
+const fieldsList: FormField<keyof IFormItems>[] = [
     {
         label: "上级平台",
         type: "select",
         name: "pid",
-        className: "select-default",
         formatter: "number",
+        formItemClassName: formStyles.formItem,
         syncDefaultOption: {
             name: "全部",
             value: "",
@@ -40,22 +39,22 @@ const fieldsList: IFieldItem<keyof IFormItems>[] = [
         label: "平台id",
         type: "input",
         name: "platform_id",
-        className: "input-default",
         placeholder: "请输入平台id",
+        formItemClassName: formStyles.formItem,
     },
     {
         label: "平台名称",
         type: "input",
         name: "platform_name",
-        className: "input-default",
         placeholder: "请输入平台名称",
+        formItemClassName: formStyles.formItem,
     },
     {
         label: "平台状态",
         type: "select",
         name: "status",
-        className: "select-default",
         formatter: "number",
+        formItemClassName: formStyles.formItem,
         optionList: [
             {
                 name: "全部",
@@ -85,7 +84,7 @@ const IndexPage: React.FC = props => {
         pageSize: 50,
         total: 0,
     });
-    const searchRef = useRef<SearchForm>(null);
+    const searchRef = useRef<SearchFormRef>(null);
     const [editModalVisible, setModalVisible] = useState<boolean>(false);
     const [editType, setEditType] = useState<"add" | "edit">("add");
 
@@ -217,7 +216,7 @@ const IndexPage: React.FC = props => {
             <PageHeaderWrapper>
                 <Card
                     bordered={false}
-                    className={[formStyles.formItem, formStyles.formCard].join(" ")}
+                    className={classnames([formStyles.formItem, formStyles.formCard])}
                 >
                     <SearchForm
                         ref={searchRef}
@@ -226,7 +225,7 @@ const IndexPage: React.FC = props => {
                     >
                         <LoadingButton
                             type="primary"
-                            className={btnStyles.btnGroup}
+                            className={formStyles.formItem}
                             onClick={handleSearch}
                         >
                             搜索
@@ -234,10 +233,11 @@ const IndexPage: React.FC = props => {
                     </SearchForm>
                 </Card>
                 <ProTable<ITableListItem>
+                    className={formStyles.formItem}
                     rowKey="platform_id"
                     headerTitle="平台列表"
                     // actionRef={actionRef}
-                    search={false}
+                    // search={false}
                     loading={loading}
                     toolBarRender={() => [
                         <Button type="primary" onClick={addPlatform}>

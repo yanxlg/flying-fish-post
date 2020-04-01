@@ -164,6 +164,17 @@ const offersOptionsList = Mock.mock({
     ]
 });
 
+const kpiList = Mock.mock({
+    "list|100-500": [
+        {
+            "country|1": [0, 1, 2, 3, 4],
+            "trans_type": "@cname",
+            "aging": "@integer",
+            "effective_time": "@datetime()"
+        }
+    ]
+});
+
 export default {
     "GET /*/logistics/list": async (req: Request, res: Response) => {
         const { page, page_count } = req.query;
@@ -361,6 +372,22 @@ export default {
                 "registration_fee": "@string('number')",
                 "kilogram_fee": "@string('number')"
             })
+        });
+    },
+    "GET /*/kpi/list": async (req: Request, res: Response) => {
+        await sleep(4);
+        const { page, page_count } = req.query;
+        const { list } = kpiList;
+        res.status(200).send({
+            code: 200,
+            message: "By mock.js",
+            data: {
+                list: list.slice(
+                    Number(page_count) * Number(page - 1),
+                    Number(page_count) * Number(page)
+                ),
+                total: list.length
+            }
         });
     }
 };
