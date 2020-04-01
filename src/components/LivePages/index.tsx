@@ -1,9 +1,9 @@
-import React from 'react';
+import React from "react";
 
-import { matchPath } from 'dva/router';
-import { RouteComponentProps } from 'react-router';
+import { matchPath } from "dva/router";
+import { RouteComponentProps } from "react-router";
 
-import styles from './_index.less';
+import styles from "./_index.less";
 
 declare interface IRouter {
     path: string;

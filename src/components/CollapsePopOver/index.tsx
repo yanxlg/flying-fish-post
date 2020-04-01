@@ -1,8 +1,8 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import ReactDOM from 'react-dom';
-import { Collapse } from 'antd';
-import './index.less';
-import CollapsePanel from 'antd/es/collapse/CollapsePanel';
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import ReactDOM from "react-dom";
+import { Collapse } from "antd";
+import "./index.less";
+import CollapsePanel from "antd/es/collapse/CollapsePanel";
 
 const { Panel } = Collapse;
 
@@ -11,7 +11,7 @@ declare interface ICollapsePopOverProps {
 }
 
 const Index: React.FC<ICollapsePopOverProps> = ({ collapse, children }) => {
-    const [x, setX] = useState();
+    const [x, setX] = useState<number>();
     const ref = useRef<CollapsePanel>(null);
 
     useEffect(() => {
@@ -22,15 +22,15 @@ const Index: React.FC<ICollapsePopOverProps> = ({ collapse, children }) => {
             const rect1 = container!.getBoundingClientRect();
             setX(rect.x - rect1.x + rect.width / 2);
         };
-        window.addEventListener('mousedown', onClick);
+        window.addEventListener("mousedown", onClick);
         return () => {
-            window.removeEventListener('mousedown', onClick);
+            window.removeEventListener("mousedown", onClick);
         };
     }, []);
 
     return useMemo(() => {
         return (
-            <Collapse activeKey={collapse ? '1' : undefined} bordered={false}>
+            <Collapse activeKey={collapse ? "1" : undefined} bordered={false}>
                 <Panel
                     forceRender={true}
                     ref={ref}

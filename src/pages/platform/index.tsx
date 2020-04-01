@@ -7,7 +7,7 @@ import LoadingButton from "@/components/LoadingButton";
 import { PaginationConfig } from "antd/es/pagination";
 import EditModal from "./components/EditModal/index";
 import ProTable, { ProColumns } from "@/components/OptimizeProTable";
-import classnames from 'classnames';
+import classnames from "classnames";
 
 import { platformList, platformStatusList } from "@/enums/StatusEnum";
 import { getPlatformList, queryOptionList } from "@/services/platform";

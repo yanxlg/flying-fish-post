@@ -128,7 +128,7 @@ const ChannelsPage: React.FC = () => {
         onChange,
     } = useList({ formRef: searchRef, queryList: queryOffersList });
 
-    const { visible, onClose, setVisibleProps } = useModal();
+    const { visible, onClose, setVisibleProps } = useModal<string>();
 
     const exportTable = useCallback(() => {
         const query = searchRef.current!.getFieldsValue();

@@ -42,7 +42,7 @@ function useFilterTable<T>(columns: IWrappedProColumns<T>[]): ProColumns<T>[] {
 
     const [searchInput] = useState<RefObject<Input>>(React.createRef());
 
-    return useMemo(() => {
+    return useMemo<ProColumns<T>[]>(() => {
         return columns.map(column => {
             const { filterType, dataIndex, title, render } = column;
             if (filterType === "input") {

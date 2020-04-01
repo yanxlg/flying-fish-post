@@ -208,7 +208,6 @@ const Order3PL: React.FC = props => {
                         toolBarRender={() => opsBtn}
                     />
                 </div>
-                
             </>
         );
     }, [loading, orderList]);

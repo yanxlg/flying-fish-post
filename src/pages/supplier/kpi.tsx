@@ -74,7 +74,7 @@ const KPIPage: React.FC = () => {
         onChange,
     } = useList({ formRef: searchRef, queryList: queryKpiList });
 
-    const { visible, onClose, setVisibleProps } = useModal();
+    const { visible, onClose, setVisibleProps } = useModal<boolean>();
 
     // componentDidMount
     useEffect(() => {

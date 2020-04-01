@@ -4,7 +4,7 @@ import { PageHeaderWrapper } from "@ant-design/pro-layout";
 import FilterForm, { FilterFormRef } from "./components/FilterForm";
 import ProTable, { ProColumns } from "@/components/OptimizeProTable";
 import BtnGroup from "./components/BtnGroup";
-import classnames from 'classnames';
+import classnames from "classnames";
 
 import { getOrderList } from "@/services/logistics/delivery";
 import { ITableListItem } from "@/interface/logistics/IDelivery";
@@ -159,7 +159,7 @@ const LogisticsPurchase: React.FC = props => {
                 >
                     <FilterForm ref={filterFormRef} getPageData={getPageData} />
                 </Card>
-                <BtnGroup/>
+                <BtnGroup />
                 <ProTable<ITableListItem>
                     // search={false}
                     headerTitle="订单列表"

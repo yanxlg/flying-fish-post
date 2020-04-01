@@ -160,7 +160,7 @@ const Order3PL: React.FC = props => {
     return useMemo(() => {
         return (
             <>
-                <FilterForm ref={filterFormRef} getPageData={getPageData}/>
+                <FilterForm ref={filterFormRef} getPageData={getPageData} />
                 <div style={{ marginTop: 40 }}>
                     <BtnGroup />
                     <ProTable<ITableListItem>
