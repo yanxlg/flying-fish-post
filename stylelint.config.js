@@ -9,5 +9,6 @@ module.exports = {
         "rule-empty-line-before": null,
         "selector-list-comma-newline-after": null,
         "selector-pseudo-class-no-unknown": null,
+        "declaration-block-trailing-semicolon": null,
     },
 };

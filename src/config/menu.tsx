@@ -40,7 +40,11 @@ export default [
                 name: "采购订单",
             },
             {
-                path: "/logistics/log",
+                path: "/logistics/overtime",
+                name: "履约超时订单",
+            },
+            {
+                path: "/logistics/billingLog",
                 name: "打单日志",
             },
         ],

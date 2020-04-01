@@ -140,7 +140,11 @@ const IndexPage: React.FC = props => {
                 align: "center",
                 width: 120,
                 render: (_, row) => {
-                    return <Button type="link">编辑</Button>;
+                    return (
+                        <Button type="link" onClick={() => aeditPlatform()}>
+                            编辑
+                        </Button>
+                    );
                 },
             },
         ];
@@ -188,6 +192,11 @@ const IndexPage: React.FC = props => {
     const addPlatform = useCallback(() => {
         setModalVisible(true);
         setEditType("add");
+    }, []);
+
+    const aeditPlatform = useCallback(() => {
+        setModalVisible(true);
+        setEditType("edit");
     }, []);
 
     const hideModal = useCallback(() => {
