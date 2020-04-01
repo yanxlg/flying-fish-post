@@ -7,15 +7,14 @@ import React, { useEffect } from "react";
 import { Link } from "umi";
 import { Dispatch } from "redux";
 import { connect } from "dva";
-import { GithubOutlined, MenuFoldOutlined } from "@ant-design/icons";
-import { Result, Button, Menu } from "antd";
+import { GithubOutlined } from "@ant-design/icons";
+import { Result, Button } from "antd";
 import RightContent from "@/components/GlobalHeader/RightContent";
 import { ConnectState } from "@/models/connect";
 import { getAuthorityFromRouter } from "@/utils/utils";
 import logo from "../assets/logo.png";
 import MenuData from "@/config/menu";
-import { MenuUnfoldOutlined } from "@ant-design/icons/lib";
-import formStyles from "react-components/es/JsonForm/_form.less";
+import "@/styles/menu.less";
 
 const noMatch = (
     <Result

@@ -9,7 +9,7 @@ import { PaginationConfig } from "antd/es/pagination";
 
 import styles from "@/styles/_table.less";
 import { defaultPageNumber, defaultPageSize, EmptyObject } from "@/config/global";
-import { ProColumns } from "@/components/OptimizeProTable";
+import { ProColumns } from "react-components/es/ProTable";
 const EmptyArray: string[] = [];
 
 export type IWrappedProColumns<T> = Omit<ProColumns<T>, "render"> & {

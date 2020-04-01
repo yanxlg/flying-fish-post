@@ -19,7 +19,7 @@ import OptionItem from "../../components/OptionItem";
 import { IWrappedProColumns, useFilterTable, useList, useModal } from "@/utils/hooks";
 import UploadLoadingBtn from "@/components/UploadLoadingBtn";
 import OfferModal from "./components/OfferModal";
-import ProTable from "@/components/OptimizeProTable";
+import { ProTable } from "react-components";
 
 export const queryOptions = (() => {
     let syncPromise: Promise<IResponse<IOffersOptionListResponse>>;

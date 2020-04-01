@@ -12,7 +12,8 @@ import { IResponse } from "@/interface/IGlobal";
 import OptionItem from "../../components/OptionItem";
 import EditModal from "@/pages/supplier/components/logistics/EditModal";
 import { useList } from "@/utils/hooks";
-import ProTable, { ProColumns } from "@/components/OptimizeProTable";
+import { ProTable } from "react-components";
+import { ProColumns } from "react-components/es/ProTable";
 
 export const queryOptions = (() => {
     let syncPromise: Promise<IResponse<IOptionListResponse>>;

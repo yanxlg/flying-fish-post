@@ -10,7 +10,8 @@ import { queryReturnList, exportReturnList, queryOptionList } from "@/services/a
 import { IResponse } from "@/interface/IGlobal";
 import OptionItem from "@/components/OptionItem";
 import { useList } from "@/utils/hooks";
-import ProTable, { ProColumns } from "@/components/OptimizeProTable";
+import { ProTable } from "react-components";
+import { ProColumns } from "react-components/es/ProTable";
 
 export const queryOptions = (() => {
     let syncPromise: Promise<IResponse<IOptionListResponse>>;

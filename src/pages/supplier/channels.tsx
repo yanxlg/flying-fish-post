@@ -21,7 +21,7 @@ import { bool, reverseBool } from "@/utils/utils";
 import { SettlementModes, SettlementModesCode } from "@/config/dictionaries/Supplier";
 import { IWrappedProColumns, useFilterTable, useList } from "@/utils/hooks";
 import { PopConfirmLoadingButton } from "react-components";
-import ProTable from "@/components/OptimizeProTable";
+import { ProTable } from "react-components";
 
 export const queryOptions = (() => {
     let syncPromise: Promise<IResponse<IChannelsOptionListResponse>>;

@@ -17,7 +17,8 @@ import { DownloadOutlined, PlusOutlined } from "@ant-design/icons";
 import { IResponse } from "@/interface/IGlobal";
 import { useList, useModal } from "@/utils/hooks";
 import UploadLoadingBtn from "@/components/UploadLoadingBtn";
-import ProTable, { ProColumns } from "@/components/OptimizeProTable";
+import { ProTable } from "react-components";
+import { ProColumns } from "react-components/es/ProTable";
 import KpiEditModal from "@/pages/supplier/components/KpiEditModal";
 
 export const queryOptions = (() => {
