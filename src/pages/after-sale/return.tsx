@@ -1,9 +1,10 @@
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { PageHeaderWrapper } from "@ant-design/pro-layout";
 import { Card, Tabs } from "antd";
-import SearchForm, { SearchFormRef, FormField } from "@/components/SearchForm";
-import formStyles from "@/components/SearchForm/_form.less";
-import LoadingButton from "@/components/LoadingButton";
+import { JsonForm } from "react-components";
+import { FormField, JsonFormRef } from "react-components/es/JsonForm";
+import formStyles from "react-components/es/JsonForm/_form.less";
+import { LoadingButton } from "react-components";
 import { IReturnRequestForm, IOptionListResponse, TableListItem } from "@/interface/IAfterSale";
 import { queryReturnList, exportReturnList, queryOptionList } from "@/services/afterSale";
 import { IResponse } from "@/interface/IGlobal";
@@ -180,7 +181,7 @@ const PageSize = 50;
 
 const ReturnPage: React.FC = props => {
     const [type, setType] = useState<number>(1);
-    const searchRef = useRef<SearchFormRef>(null);
+    const searchRef = useRef<JsonFormRef>(null);
     const {
         loading,
         pageNumber,
@@ -229,7 +230,7 @@ const ReturnPage: React.FC = props => {
                     bordered={false}
                     className={[formStyles.formItem, formStyles.formCard].join(" ")}
                 >
-                    <SearchForm
+                    <JsonForm
                         fieldList={formConfig}
                         ref={searchRef}
                         initialValues={{
@@ -246,7 +247,7 @@ const ReturnPage: React.FC = props => {
                         >
                             搜索
                         </LoadingButton>
-                    </SearchForm>
+                    </JsonForm>
                 </Card>
                 <ProTable<TableListItem>
                     className={formStyles.formItem}

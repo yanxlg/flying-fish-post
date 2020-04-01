@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Modal, Descriptions, Spin, Card } from "antd";
 import styles from "@/styles/_supplier.less";
-import formStyles from "@/components/SearchForm/_form.less";
+import formStyles from "react-components/es/JsonForm/_form.less";
 import { IOfferDetail } from "@/interface/ISupplier";
 import { queryOfferDetail } from "@/services/supplier";
 import { EmptyObject } from "@/config/global";

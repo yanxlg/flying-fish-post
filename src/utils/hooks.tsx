@@ -3,7 +3,7 @@ import { Button, Input } from "antd";
 import { FilterDropdownProps } from "antd/es/table/interface";
 import { SearchOutlined } from "@ant-design/icons/lib";
 import Highlighter from "react-highlight-words";
-import { SearchFormRef } from "@/components/SearchForm";
+import { JsonFormRef } from "react-components/es/JsonForm";
 import { IPaginationResponse, IRequestPagination, IResponse } from "@/interface/IGlobal";
 import { PaginationConfig } from "antd/es/pagination";
 
@@ -140,7 +140,7 @@ function useList<T, Q extends IRequestPagination = any, S = any>({
     autoQuery = true,
 }: {
     queryList: (query: Q) => Promise<IResponse<IPaginationResponse<T>>>;
-    formRef?: RefObject<SearchFormRef>;
+    formRef?: RefObject<JsonFormRef>;
     extraQuery?: { [key: string]: any };
     defaultState?: { pageNumber?: number; pageSize?: number };
     autoQuery?: boolean;

@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { PageHeaderWrapper } from "@ant-design/pro-layout";
 import { Button, Card } from "antd";
-import SearchForm, { FormField, SearchFormRef } from "@/components/SearchForm";
-import formStyles from "@/components/SearchForm/_form.less";
-import LoadingButton from "@/components/LoadingButton";
+import { JsonForm } from "react-components";
+import { FormField, JsonFormRef } from "react-components/es/JsonForm";
+import formStyles from "react-components/es/JsonForm/_form.less";
+import { LoadingButton } from "react-components";
 import {
     queryKpiList,
     uploadKpi,
@@ -17,7 +18,6 @@ import { IResponse } from "@/interface/IGlobal";
 import { useList, useModal } from "@/utils/hooks";
 import UploadLoadingBtn from "@/components/UploadLoadingBtn";
 import ProTable, { ProColumns } from "@/components/OptimizeProTable";
-import OptionItem from "@/components/OptionItem";
 import KpiEditModal from "@/pages/supplier/components/KpiEditModal";
 
 export const queryOptions = (() => {
@@ -60,7 +60,7 @@ const formConfig: FormField<keyof IOffersRequestForm>[] = [
 ];
 
 const OrderPage: React.FC = () => {
-    const searchRef = useRef<SearchFormRef>(null);
+    const searchRef = useRef<JsonFormRef>(null);
     const {
         loading,
         pageNumber,
@@ -139,7 +139,7 @@ const OrderPage: React.FC = () => {
                             bordered={false}
                             className={[formStyles.formItem, formStyles.formCard].join(" ")}
                         >
-                            <SearchForm
+                            <JsonForm
                                 fieldList={formConfig}
                                 enableCollapse={false}
                                 ref={searchRef}
@@ -158,7 +158,7 @@ const OrderPage: React.FC = () => {
                                 >
                                     搜索
                                 </LoadingButton>
-                            </SearchForm>
+                            </JsonForm>
                         </Card>
                         <ProTable<IKpiItem>
                             className={formStyles.formItem}

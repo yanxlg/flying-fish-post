@@ -19,7 +19,8 @@ import { useRowSelection } from "./hooks";
 import TableAlert, { TableAlertRef } from "@/components/OptimizeProTable/component/alert";
 import { SizeType } from "antd/es/config-provider/SizeContext";
 import { TableProps } from "antd/lib/table";
-import { FitTable, goButton, showTotal } from "@/components/FitTable";
+import { FitTable } from "react-components";
+import { goButton, showTotal } from "react-components/es/FitTable";
 import { defaultPageSizeOptions } from "@/config/global";
 
 export interface ColumnsState {

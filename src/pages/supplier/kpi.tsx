@@ -1,31 +1,21 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { PageHeaderWrapper } from "@ant-design/pro-layout";
 import { Button, Card } from "antd";
-import SearchForm, { FormField, SearchFormRef } from "@/components/SearchForm";
-import formStyles from "@/components/SearchForm/_form.less";
-import LoadingButton from "@/components/LoadingButton";
+import { JsonForm } from "react-components";
+import { FormField, JsonFormRef } from "react-components/es/JsonForm";
+import formStyles from "react-components/es/JsonForm/_form.less";
+import { LoadingButton } from "react-components";
 import {
-    queryOffersOptionsList,
-    exportOffersList,
-    downloadOfferTemplate,
-    uploadOffer,
     queryKpiList,
     uploadKpi,
     downloadKpiTemplate,
     queryKpiOptionsList,
 } from "@/services/supplier";
-import {
-    IKpiItem,
-    IOffer,
-    IOffersOptionListResponse,
-    IOffersRequestForm,
-    IKpiOptionListResponse,
-} from "@/interface/ISupplier";
+import { IKpiItem, IOffersRequestForm, IKpiOptionListResponse } from "@/interface/ISupplier";
 import { DownloadOutlined, PlusOutlined } from "@ant-design/icons";
 import { IResponse } from "@/interface/IGlobal";
 import { useList, useModal } from "@/utils/hooks";
 import UploadLoadingBtn from "@/components/UploadLoadingBtn";
-import OfferModal from "./components/OfferModal";
 import ProTable, { ProColumns } from "@/components/OptimizeProTable";
 import OptionItem from "@/components/OptionItem";
 import KpiEditModal from "@/pages/supplier/components/KpiEditModal";
@@ -62,7 +52,7 @@ const formConfig: FormField<keyof IOffersRequestForm>[] = [
 ];
 
 const KPIPage: React.FC = () => {
-    const searchRef = useRef<SearchFormRef>(null);
+    const searchRef = useRef<JsonFormRef>(null);
     const {
         loading,
         pageNumber,
@@ -140,7 +130,7 @@ const KPIPage: React.FC = () => {
                             bordered={false}
                             className={[formStyles.formItem, formStyles.formCard].join(" ")}
                         >
-                            <SearchForm
+                            <JsonForm
                                 fieldList={formConfig}
                                 enableCollapse={false}
                                 ref={searchRef}
@@ -159,7 +149,7 @@ const KPIPage: React.FC = () => {
                                 >
                                     搜索
                                 </LoadingButton>
-                            </SearchForm>
+                            </JsonForm>
                         </Card>
                         <ProTable<IKpiItem>
                             className={formStyles.formItem}

@@ -1,12 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { DatePicker, Form, Input, message, Modal, Select, Spin } from "antd";
-import { UploadChangeParam } from "antd/lib/upload/interface";
+import { DatePicker, Form, message, Modal, Select, Spin } from "antd";
 import { addLogistic, queryLogistic, editLogistic } from "@/services/supplier";
 import { ILogisticsBody, ILogisticsEditBody, IKpiOptionListResponse } from "@/interface/ISupplier";
 import { EmptyObject } from "@/config/global";
 import { IResponse } from "@/interface/IGlobal";
 import styles from "@/styles/_supplier.less";
-import RichInput from "@/components/Input/RichInput";
+import { RichInput } from "react-components";
 
 declare interface KpiEditModalProps {
     visible: boolean | string;
@@ -163,7 +162,7 @@ const KpiEditModal: React.FC<KpiEditModalProps> = ({ visible, onCancel, queryOpt
                                     },
                                 ]}
                             >
-                                <RichInput type="number" />
+                                <RichInput richType="number" />
                             </Form.Item>
                             <Form.Item
                                 label="生效日期"

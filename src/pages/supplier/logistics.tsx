@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { PageHeaderWrapper } from "@ant-design/pro-layout";
 import { Button, Card } from "antd";
-import SearchForm, { FormField, SearchFormRef } from "@/components/SearchForm";
-import formStyles from "@/components/SearchForm/_form.less";
-import btnStyles from "@/styles/_btn.less";
-import LoadingButton from "@/components/LoadingButton";
+import { JsonForm } from "react-components";
+import { FormField, JsonFormRef } from "react-components/es/JsonForm";
+import formStyles from "react-components/es/JsonForm/_form.less";
+import { LoadingButton } from "react-components";
 import { exportLogisticsList, queryLogisticsList, queryOptionList } from "@/services/supplier";
 import { ILogistics, IOptionListResponse, ILogisticsRequestForm } from "@/interface/ISupplier";
 import { PlusOutlined } from "@ant-design/icons";
@@ -37,7 +37,7 @@ const formConfig: FormField<keyof ILogisticsRequestForm>[] = [
 ];
 
 const LogisticsPage: React.FC = () => {
-    const searchRef = useRef<SearchFormRef>(null);
+    const searchRef = useRef<JsonFormRef>(null);
     const [visible, setVisible] = useState<boolean | string>(false);
     const {
         loading,
@@ -224,7 +224,7 @@ const LogisticsPage: React.FC = () => {
                             bordered={false}
                             className={[formStyles.formItem, formStyles.formCard].join(" ")}
                         >
-                            <SearchForm
+                            <JsonForm
                                 fieldList={formConfig}
                                 enableCollapse={false}
                                 ref={searchRef}
@@ -241,7 +241,7 @@ const LogisticsPage: React.FC = () => {
                                 >
                                     搜索
                                 </LoadingButton>
-                            </SearchForm>
+                            </JsonForm>
                         </Card>
                         <ProTable<ILogistics>
                             className={formStyles.formItem}

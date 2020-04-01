@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { PageHeaderWrapper } from "@ant-design/pro-layout";
 import { Button, Card } from "antd";
-import SearchForm, { FormField, SearchFormRef } from "@/components/SearchForm";
-import formStyles from "@/components/SearchForm/_form.less";
-import btnStyles from "@/styles/_btn.less";
-import LoadingButton from "@/components/LoadingButton";
+import { JsonForm } from "react-components";
+import { FormField, JsonFormRef } from "react-components/es/JsonForm";
+import formStyles from "react-components/es/JsonForm/_form.less";
+import { LoadingButton } from "react-components";
 import {
     queryChannelsList,
     queryChannelsOptionsList,
@@ -20,7 +20,7 @@ import OptionItem from "../../components/OptionItem";
 import { bool, reverseBool } from "@/utils/utils";
 import { SettlementModes, SettlementModesCode } from "@/config/dictionaries/Supplier";
 import { IWrappedProColumns, useFilterTable, useList } from "@/utils/hooks";
-import PopConfirmLoadingButton from "@/components/PopConfirmLoadingButton";
+import { PopConfirmLoadingButton } from "react-components";
 import ProTable from "@/components/OptimizeProTable";
 
 export const queryOptions = (() => {
@@ -46,7 +46,7 @@ const formConfig: FormField<keyof IChannelsRequestForm>[] = [
 ];
 
 const ChannelsPage: React.FC = () => {
-    const searchRef = useRef<SearchFormRef>(null);
+    const searchRef = useRef<JsonFormRef>(null);
     const {
         loading,
         pageNumber,
@@ -279,7 +279,7 @@ const ChannelsPage: React.FC = () => {
                             bordered={false}
                             className={[formStyles.formItem, formStyles.formCard].join(" ")}
                         >
-                            <SearchForm
+                            <JsonForm
                                 enableCollapse={false}
                                 fieldList={formConfig}
                                 ref={searchRef}
@@ -296,7 +296,7 @@ const ChannelsPage: React.FC = () => {
                                 >
                                     搜索
                                 </LoadingButton>
-                            </SearchForm>
+                            </JsonForm>
                         </Card>
                         <ProTable<IChannel>
                             className={formStyles.formItem}

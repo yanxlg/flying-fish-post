@@ -1,9 +1,10 @@
 import React, { useCallback, useMemo, useRef } from "react";
 import { PageHeaderWrapper } from "@ant-design/pro-layout";
 import { Card } from "antd";
-import SearchForm, { FormField, SearchFormRef } from "@/components/SearchForm";
-import formStyles from "@/components/SearchForm/_form.less";
-import LoadingButton from "@/components/LoadingButton";
+import { JsonForm } from "react-components";
+import { FormField, JsonFormRef } from "react-components/es/JsonForm";
+import formStyles from "react-components/es/JsonForm/_form.less";
+import { LoadingButton } from "react-components";
 import { IReturnRequestForm, TableListItem } from "@/interface/IAfterSale";
 import { queryHistoryReturnList, exportHistoryReturnList } from "@/services/afterSale";
 import ProTable, { ProColumns } from "@/components/OptimizeProTable";
@@ -165,7 +166,7 @@ const columns: ProColumns<TableListItem>[] = [
 ];
 
 const HistoryPage: React.FC = props => {
-    const searchRef = useRef<SearchFormRef>(null);
+    const searchRef = useRef<JsonFormRef>(null);
 
     const {
         loading,
@@ -193,7 +194,7 @@ const HistoryPage: React.FC = props => {
                     bordered={false}
                     className={[formStyles.formItem, formStyles.formCard].join(" ")}
                 >
-                    <SearchForm
+                    <JsonForm
                         fieldList={formConfig}
                         ref={searchRef}
                         initialValues={{
@@ -210,7 +211,7 @@ const HistoryPage: React.FC = props => {
                         >
                             搜索
                         </LoadingButton>
-                    </SearchForm>
+                    </JsonForm>
                 </Card>
                 <ProTable<TableListItem>
                     headerTitle="查询表格"

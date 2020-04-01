@@ -1,8 +1,9 @@
 import React, { RefObject } from "react";
 import { Button } from "antd";
 import { ColumnProps } from "antd/es/table";
-import SearchForm, { FormField, SearchFormRef } from "@/components/SearchForm";
-import { FitTable } from "@/components/FitTable";
+import { JsonForm } from "react-components";
+import { FormField, JsonFormRef } from "react-components/es/JsonForm";
+import { FitTable } from "react-components";
 
 import { platformList, platformStatusList } from "@/enums/StatusEnum";
 import { getPlatformList } from "@/services/platform";
@@ -23,7 +24,7 @@ interface IState {
 }
 
 class Index extends React.PureComponent<{}, IState> {
-    private formRef: RefObject<SearchFormRef> = React.createRef();
+    private formRef: RefObject<JsonFormRef> = React.createRef();
     private fieldsList: FormField[] = [
         {
             label: "任务状态",
@@ -177,7 +178,7 @@ class Index extends React.PureComponent<{}, IState> {
         const { loading, platformList } = this.state;
         return (
             <>
-                <SearchForm
+                <JsonForm
                     ref={this.formRef}
                     fieldList={this.fieldsList}
                     initialValues={this.initialValues}
@@ -200,7 +201,7 @@ class Index extends React.PureComponent<{}, IState> {
                     >
                         新增
                     </Button>
-                </SearchForm>
+                </JsonForm>
                 <FitTable
                     bordered
                     pagination={false}

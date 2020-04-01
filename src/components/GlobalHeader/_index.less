@@ -1,4 +1,4 @@
-@import '~antd/es/style/themes/default.less';
+@import "~antd/es/style/themes/default.less";
 
 @pro-header-hover-bg: rgba(0, 0, 0, 0.025);
 
@@ -10,15 +10,23 @@
     margin-right: 10px;
 }
 
-@media only screen and (max-width: @screen-md) {
-    .breadcrumb{
-        display: none;
-    }
+.right-content {
+    position: absolute;
+    left: 60px;
+    right: 0;
+    height: 100%;
+    top: 0;
 }
 
-.breadcrumb{
+.breadcrumb {
     position: absolute;
     left: 60px;
     top: 50%;
     transform: translateY(-50%);
+}
+
+@media only screen and (max-width: @screen-md) {
+    .breadcrumb {
+        display: none;
+    }
 }
