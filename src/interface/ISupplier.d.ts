@@ -85,7 +85,7 @@ declare interface IOffer {
     uploader: string;
     upload_time: string;
     active_time: string;
-    id: number;
+    id: string;
 }
 
 export declare interface IOffersRequestForm {

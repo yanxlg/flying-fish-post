@@ -22,7 +22,7 @@
         "query-string": "^6.11.1",
         "react-highlight-words": "^0.16.0",
         "react-lazyload": "^2.6.6",
-        "react-components": "git+https://g.gitvv.com/trigram/react-components.git#0.0.2"
+        "react-components": "git+ssh://git@git.gitvv.com:38022/trigram/react-components.git#0.0.3"
     },
     "devDependencies": {
         "@types/react-lazyload": "^2.6.0",
